@@ -1,5 +1,5 @@
 {
-    "name": "Knit",
+    "name": "knit",
     "private": true,
     "scripts": {
         "dev": "turbo run dev",
@@ -9,9 +9,14 @@
         "format": "prettier --write \"**/*.{ts,tsx,md}\""
     },
     "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "eslint": "^10.14.0",
+        "eslint-config-prettier": "^10.1.8",
+        "globals": "^17.13.0",
         "prettier": "3.9.6",
         "turbo": "^2.11.10",
-        "typescript": "7.0.2"
+        "typescript": "^6.0.3",
+        "typescript-eslint": "^8.72.1"
     },
     "packageManager": "pnpm@12.16.1",
     "engines": {

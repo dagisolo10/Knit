@@ -1,0 +1,13 @@
+{
+    "$schema": "https://www.typescriptlang.org/tsconfig",
+    "extends": "./tsconfig.base.json",
+    "compilerOptions": {
+        "lib": ["ES2024"],
+        "target": "ES2024",
+
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+
+        "verbatimModuleSyntax": true
+    }
+}
