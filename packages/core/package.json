@@ -1,0 +1,23 @@
+{
+    "name": "@knit/core",
+    "license": "ISC",
+    "version": "0.1.0",
+    "description": "Core functionality for the Knit framework",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "scripts": {
+        "clean": "rm -rf dist",
+        "build": "tsc -p tsconfig.json",
+        "check-types": "tsc --noEmit -p tsconfig.json"
+    },
+    "files": [
+        "dist"
+    ]
+}
