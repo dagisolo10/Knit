@@ -1,0 +1,20 @@
+{
+    "name": "Knit",
+    "private": true,
+    "scripts": {
+        "dev": "turbo run dev",
+        "lint": "turbo run lint",
+        "build": "turbo run build",
+        "check-types": "turbo run check-types",
+        "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    },
+    "devDependencies": {
+        "prettier": "3.9.6",
+        "turbo": "^2.11.10",
+        "typescript": "7.0.2"
+    },
+    "packageManager": "pnpm@12.16.1",
+    "engines": {
+        "node": ">=24"
+    }
+}
