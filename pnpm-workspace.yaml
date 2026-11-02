@@ -1,2 +1,9 @@
 packages:
     - "packages/*"
+allowBuilds:
+  builds: true
+permissions:
+  builds:
+    skills: true
+  esbuild:
+    build: true
