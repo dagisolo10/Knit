@@ -1,3 +1,4 @@
+import * as p from "@clack/prompts";
 import path from "path";
 
 import { DEFAULT_OUT_FILE, generateRouteTypes } from "../routing/generate-route-types.js";
@@ -11,14 +12,18 @@ const pc = createCliColors();
 async function generate(config: KnitConfig) {
     const changed = await generateRouteTypes(config);
 
-    const message = changed ? pc.greenBright("Types generated in " + path.join(path.relative(process.cwd(), config.outDir), DEFAULT_OUT_FILE)) : pc.gray("Skipped generating types, no file changes");
+    if (changed) {
+        const output = path.join(path.relative(process.cwd(), config.outDir), DEFAULT_OUT_FILE);
 
-    const log = [pc.dim("[") + pc.bold(pc.blue("KNIT")) + pc.dim("]"), pc.dim("[") + pc.bold(pc.cyan("TYPE")) + pc.dim("]"), pc.dim("[") + pc.bold(pc.yellow("GENERATE")) + pc.dim("]"), message].join(" ");
-
-    console.log(log);
+        p.log.success(`Types generated → ${output}`);
+    } else {
+        p.log.info("No changes detected. Skipping generation.");
+    }
 }
 
 async function dev() {
+    p.intro("🧶 Knit · Development");
+
     const config = await loadConfig();
 
     const banner = `
@@ -31,13 +36,13 @@ async function dev() {
 `;
     console.log(pc.greenBright(banner));
 
+    p.note([`Source: ${path.relative(process.cwd(), config.srcDir)}`, `Output: ${path.relative(process.cwd(), config.outDir)}`, `Route file: ${config.routeFile}`].join("\n"), "Configuration");
+
     await generate(config);
 
     watchRoutes(config.srcDir, async () => await generate(config));
 
-    const log = [pc.dim("[") + pc.bold(pc.blue("KNIT")) + pc.dim("]"), pc.blueBright("Development server started.")].join(" ");
-
-    console.log(log);
+    p.outro("Watching for route changes...");
 }
 
 export { dev };

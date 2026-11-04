@@ -23,6 +23,8 @@
         "typescript": "^7.0.2"
     },
     "dependencies": {
+        "@clack/prompts": "^1.8.1",
+        "commander": "^15.0.0",
         "picocolors": "^1.1.1",
         "tsx": "^4.23.15",
         "vite": "^8.3.5"
