@@ -1,15 +1,14 @@
 import path from "path";
 
-import { loadConfig } from "../config.js";
 import { DEFAULT_OUT_FILE, generateRouteTypes } from "../routing/generate-route-types.js";
+import { loadConfig, type KnitConfig } from "../config.js";
 import { watchRoutes } from "../routing/watcher.js";
 import { createCliColors } from "./cli-colors.js";
 
+
 const pc = createCliColors();
 
-async function generate() {
-    const config = await loadConfig();
-
+async function generate(config: KnitConfig) {
     const changed = await generateRouteTypes(config);
 
     const message = changed ? pc.greenBright("Types generated in " + path.join(path.relative(process.cwd(), config.outDir), DEFAULT_OUT_FILE)) : pc.gray("Skipped generating types, no file changes");
@@ -32,9 +31,9 @@ async function dev() {
 `;
     console.log(pc.greenBright(banner));
 
-    await generate();
+    await generate(config);
 
-    watchRoutes(config.srcDir, async () => await generate());
+    watchRoutes(config.srcDir, async () => await generate(config));
 
     const log = [pc.dim("[") + pc.bold(pc.blue("KNIT")) + pc.dim("]"), pc.blueBright("Development server started.")].join(" ");
 

@@ -1,7 +1,8 @@
 import { readdir } from "fs/promises";
 import path from "path";
 
-export async function scanRoutes(srcDir: string): Promise<string[]> {
+
+export async function scanRoutes(srcDir: string, routeFile: string): Promise<string[]> {
     const entries = await readdir(srcDir, { withFileTypes: true });
 
     const routes: string[] = [];
@@ -10,10 +11,10 @@ export async function scanRoutes(srcDir: string): Promise<string[]> {
         const fullPath = path.join(srcDir, entry.name);
 
         if (entry.isDirectory()) {
-            routes.push(...(await scanRoutes(fullPath)));
+            routes.push(...(await scanRoutes(fullPath, routeFile)));
         }
 
-        if (entry.isFile() && entry.name === "page.tsx") {
+        if (entry.isFile() && entry.name === routeFile) {
             routes.push(fullPath);
         }
     }
