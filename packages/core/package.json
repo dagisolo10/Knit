@@ -24,9 +24,10 @@
     },
     "dependencies": {
         "@clack/prompts": "^1.8.1",
+        "@nestjs/common": "^12.3.2",
+        "@nestjs/core": "^12.3.2",
         "commander": "^15.0.0",
         "picocolors": "^1.1.1",
-        "tsx": "^4.23.15",
-        "vite": "^8.3.5"
+        "tsx": "^4.23.15"
     }
 }

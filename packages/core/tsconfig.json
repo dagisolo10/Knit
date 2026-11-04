@@ -19,6 +19,9 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true,
 
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+
         // Recommended and Stricter Typechecking Options
         "strict": true,
         "skipLibCheck": true,
