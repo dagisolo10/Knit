@@ -112,7 +112,7 @@ export default defineConfig({
         "Configuration",
     );
 
-    p.outro("Knit is ready! Run `pnpm knit` to start watching your routes.");
+    p.outro("Knit is ready! Run `pnpm knit dev` to start watching your routes.");
 }
 
 export { init };

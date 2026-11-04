@@ -8,4 +8,9 @@ program.name("knit").description("File-based routing and type generation for you
 
 program.command("dev").description("Watch routes and generate types").action(dev);
 
+program.action(() => {
+    console.error("No command specified. Run `knit dev` to watch routes and generate types.");
+    process.exitCode = 1;
+});
+
 program.parseAsync(process.argv);

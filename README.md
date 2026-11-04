@@ -15,27 +15,17 @@ Knit aims to bring a file-based routing experience to NestJS while preserving ev
 - **Dynamic routes** — Support dynamic segments, catch-all segments, and optional catch-all segments.
 - **Development watcher** — Automatically regenerate route types when route files change.
 - **Configurable** — Configure route directories, output directories, and route filenames.
-- **CLI** — Initialize and run Knit through simple commands.
+- **CLI** — Run the development watcher through a simple command.
 
 ## Getting Started
-
-Initialize Knit in your project:
-
-```bash
-pnpm knit init
-```
 
 Start the development watcher:
 
 ```bash
-pnpm knit
-```
-
-Or explicitly run:
-
-```bash
 pnpm knit dev
 ```
+
+If `knit.config.ts` does not exist, Knit creates one with default settings.
 
 ## Project Structure
 
@@ -62,13 +52,13 @@ Each directory represents a URL segment, and a `route.ts` file identifies a rout
 
 The structure above represents:
 
-| Route file                    | Route pattern |
-| ----------------------------- | ------------- |
-| `app/route.ts`                | `/`           |
-| `app/about/route.ts`          | `/about`      |
-| `app/users/route.ts`          | `/users`      |
-| `app/users/[id]/route.ts`     | `/users/:id`  |
-| `app/docs/[...slug]/route.ts` | `/docs/*slug` |
+| Route file                    | Route pattern     |
+| ----------------------------- | ----------------- |
+| `app/route.ts`                | `/`               |
+| `app/about/route.ts`          | `/about`          |
+| `app/users/route.ts`          | `/users`          |
+| `app/users/[id]/route.ts`     | `/users/[id]`     |
+| `app/docs/[...slug]/route.ts` | `/docs/[...slug]` |
 
 Knit also supports optional catch-all segments using `[[...slug]]`.
 
@@ -147,11 +137,9 @@ These generated types provide a type-safe representation of your application's r
 
 ## CLI Commands
 
-| Command          | Description                               |
-| ---------------- | ----------------------------------------- |
-| `pnpm knit init` | Initialize Knit configuration.            |
-| `pnpm knit`      | Start the development watcher.            |
-| `pnpm knit dev`  | Start the development watcher explicitly. |
+| Command         | Description                      |
+| --------------- | -------------------------------- |
+| `pnpm knit dev` | Watch routes and generate types. |
 
 ## Roadmap
 

@@ -30,10 +30,12 @@ async function generate(config: KnitConfig) {
  * Starts the development workflow.
  *
  * Loads the Knit config, prints the resolved configuration, generates route
- * types once, and then watches the source directory for changes. The file
- * watcher keeps the process alive after this function resolves.
+ * types once, and then watches the source directory for changes. If the config
+ * is missing, a default `knit.config.ts` is created. The file watcher keeps the
+ * process alive after this function resolves.
  *
- * @throws {Error} If configuration loading or the initial type generation fails.
+ * @throws {Error} If reading or creating the configuration fails, configuration
+ * loading fails, or the initial type generation fails.
  */
 async function dev() {
     p.intro("🧶 Knit · Development");
@@ -42,7 +44,11 @@ async function dev() {
 
     try {
         await access(configPath);
-    } catch {
+    } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+            throw error;
+        }
+
         const generatedConfig = `import { defineConfig } from "@knit/core";
 
 export default defineConfig({
@@ -52,8 +58,14 @@ export default defineConfig({
 });
 `;
 
-        await writeFile(configPath, generatedConfig, "utf-8");
-        p.log.success("Created default knit.config.ts");
+        try {
+            await writeFile(configPath, generatedConfig, { encoding: "utf-8", flag: "wx" });
+            p.log.success("Created default knit.config.ts");
+        } catch (writeError) {
+            if ((writeError as NodeJS.ErrnoException).code !== "EEXIST") {
+                throw writeError;
+            }
+        }
     }
 
     const config = await loadConfig();
