@@ -1,16 +1,22 @@
 import { watch } from "fs";
-import path from "path";
 
-export async function watchRoutes(appDir: string, onChange: () => Promise<void>) {
+export async function watchRoutes(srcDir: string, onChange: () => Promise<void>) {
+    let generation = Promise.resolve();
+    let debounceTimer: ReturnType<typeof setTimeout>;
+
+    const queueGeneration = () => {
+        clearTimeout(debounceTimer);
+
+        debounceTimer = setTimeout(() => {
+            generation = generation
+                .then(() => onChange())
+                .catch((error) => {
+                    console.error("[KNIT] Failed to regenerate route types:", error);
+                });
+        }, 100);
+    };
+
     const { signal } = new AbortController();
 
-    const watcher = watch(appDir, { recursive: true, signal }, (_, filename) => {
-        if (!filename) return;
-
-        if (path.basename(filename) === "page.tsx") {
-            onChange();
-        }
-    });
-
-    return watcher;
+    watch(srcDir, { recursive: true, signal }, queueGeneration);
 }

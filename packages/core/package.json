@@ -1,21 +1,22 @@
 {
     "name": "@knit/core",
     "version": "0.0.1",
-    "private": true,
     "type": "module",
     "license": "ISC",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {
         ".": {
-            "types": "./dist/index.d.ts",
-            "import": "./dist/index.js"
+            "import": "./dist/index.js",
+            "types": "./dist/index.d.ts"
         }
+    },
+    "bin": {
+        "knit": "./dist/cli/index.js"
     },
     "scripts": {
         "build": "tsc",
-        "dev:build": "tsc --watch",
-        "routing": "pnpm exec tsx --watch ./src/routing/index.ts"
+        "dev:build": "tsc --watch"
     },
     "devDependencies": {
         "@types/node": "^26.6.6",
@@ -23,6 +24,7 @@
         "typescript": "^7.0.2"
     },
     "dependencies": {
-        "picocolors": "^1.1.1"
+        "picocolors": "^1.1.1",
+        "vite": "^8.3.5"
     }
 }

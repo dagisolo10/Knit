@@ -1,9 +1,10 @@
 packages:
     - "packages/*"
+    - "examples/*"
 allowBuilds:
-  builds: true
+    builds: true
 permissions:
-  builds:
-    skills: true
-  esbuild:
-    build: true
+    builds:
+        skills: true
+    esbuild:
+        build: true
