@@ -33,9 +33,9 @@ async function loadConfig(cwd = process.cwd()): Promise<KnitConfig> {
     }
 
     return {
+        routeFile: config.routeFile,
         srcDir: path.resolve(cwd, config.srcDir),
         outDir: path.resolve(cwd, config.outDir),
-        routeFile: path.resolve(cwd, config.routeFile),
     };
 }
 
