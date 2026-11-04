@@ -25,7 +25,7 @@ ${generateTypeAlias("RoutePattern", routePatterns)}
 ${generateTypeAlias("RouteParams", routeParams)}
 `;
 
-    mkdirSync(path.dirname(options.outDir), { recursive: true });
+    mkdirSync(options.outDir, { recursive: true });
 
     return writeFileIfChanged(path.join(options.outDir, DEFAULT_OUT_FILE), content);
 }

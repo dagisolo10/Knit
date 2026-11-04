@@ -9,5 +9,5 @@ import picocolors from "picocolors";
  * while redirected output stays plain.
  */
 export function createCliColors(interactive = process.stdout.isTTY === true) {
-    return picocolors.createColors(interactive);
+    return picocolors.createColors(interactive && !("NO_COLOR" in process.env));
 }

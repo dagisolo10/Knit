@@ -11,9 +11,9 @@ export type RoutePattern =
 
 export type RouteParams = {
 	"/profile": {  };
-	"/profile/[[...docs]]": { docs?: docs };
+	"/profile/[[...docs]]": { docs?: string[] };
 	"/settings": {  };
-	"/user/[...slug]": { slug: slug };
-	"/user/[id]": { id: id }
+	"/user/[...slug]": { slug: string[] };
+	"/user/[id]": { id: string }
 };
 

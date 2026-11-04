@@ -34,9 +34,7 @@ async function dev() {
 
     await generate();
 
-    watchRoutes(config.srcDir, async () => {
-        void generate();
-    });
+    watchRoutes(config.srcDir, async () => await generate());
 
     const log = [pc.dim("[") + pc.bold(pc.blue("KNIT")) + pc.dim("]"), pc.blueBright("Development server started.")].join(" ");
 

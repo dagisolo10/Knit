@@ -18,7 +18,7 @@ function setPattern(routesMap: Map<string, ParsedRouteParam>, segment: Exclude<R
     const normalizedPattern = path.slice(sliceStart, sliceEnd);
 
     const current = routesMap.get(pattern) ?? { param: {} };
-    current.param[normalizedPattern] = { value: normalizedPattern, segment };
+    current.param[normalizedPattern] = { segment, value: segment === "dynamic" ? "string" : "string[]" };
     routesMap.set(pattern, current);
 }
 
