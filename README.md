@@ -1,159 +1,164 @@
-# Turborepo starter
+# 🧶 Knit
 
-This Turborepo starter is maintained by the Turborepo core team.
+**Type-safe file-based routing for your applications.**
 
-## Using this example
+Knit is a TypeScript route type generator built around filesystem-based routing. It scans your route directory and generates TypeScript definitions for your routes and their parameters.
 
-Run the following command:
+Knit aims to bring a file-based routing experience to NestJS while preserving everything that makes NestJS powerful.
 
-```sh
-npx create-turbo@latest
+> Currently, Knit provides route scanning, type generation, and CLI tooling. NestJS integration and runtime route registration are not yet implemented.
+
+## Features
+
+- **File-based routing** — Define routes through your project directory structure.
+- **Type generation** — Automatically generate TypeScript route patterns and parameter types.
+- **Dynamic routes** — Support dynamic segments, catch-all segments, and optional catch-all segments.
+- **Development watcher** — Automatically regenerate route types when route files change.
+- **Configurable** — Configure route directories, output directories, and route filenames.
+- **CLI** — Initialize and run Knit through simple commands.
+
+## Getting Started
+
+Initialize Knit in your project:
+
+```bash
+pnpm knit init
 ```
 
-## What's inside?
+Start the development watcher:
 
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `@next/eslint-plugin-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+```bash
+pnpm knit
 ```
 
-Without global `turbo`, use your package manager:
+Or explicitly run:
 
-```sh
-cd my-turborepo
-npx turbo build
-pnpm exec turbo build
-pnpm exec turbo build
+```bash
+pnpm knit dev
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+## Project Structure
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+Knit discovers routes based on your configured source directory.
 
-```sh
-turbo build --filter=docs
+For example:
+
+```text
+src/
+└── app/
+    ├── route.ts
+    ├── about/
+    │   └── route.ts
+    ├── users/
+    │   ├── route.ts
+    │   └── [id]/
+    │       └── route.ts
+    └── docs/
+        └── [...slug]/
+            └── route.ts
 ```
 
-Without global `turbo`:
+Each directory represents a URL segment, and a `route.ts` file identifies a route.
 
-```sh
-npx turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+The structure above represents:
+
+| Route file                    | Route pattern |
+| ----------------------------- | ------------- |
+| `app/route.ts`                | `/`           |
+| `app/about/route.ts`          | `/about`      |
+| `app/users/route.ts`          | `/users`      |
+| `app/users/[id]/route.ts`     | `/users/:id`  |
+| `app/docs/[...slug]/route.ts` | `/docs/*slug` |
+
+Knit also supports optional catch-all segments using `[[...slug]]`.
+
+## Configuration
+
+Knit uses a `knit.config.ts` file in your project root.
+
+```ts
+import { defineConfig } from "@knit/core";
+
+export default defineConfig({
+    srcDir: "./src/app",
+    outDir: "./src/types",
+    routeFile: "route.ts",
+});
 ```
 
-### Develop
+| Option      | Description                                  |
+| ----------- | -------------------------------------------- |
+| `srcDir`    | Directory containing your route files.       |
+| `outDir`    | Directory where generated types are written. |
+| `routeFile` | Filename Knit uses to identify route files.  |
 
-To develop all apps and packages, run the following command:
+## Generated Types
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+Knit automatically generates TypeScript definitions from your filesystem routes.
 
-```sh
-cd my-turborepo
-turbo dev
+The generated file contains two exports:
+
+- `RoutePattern` — A union of all discovered route patterns.
+- `RouteParams` — A mapping between each route pattern and its corresponding parameters.
+
+For example, given these routes:
+
+```text
+src/app/
+├── profile/
+│   ├── route.ts
+│   └── [[...docs]]/
+│       └── route.ts
+├── settings/
+│   └── route.ts
+└── user/
+    ├── [...slug]/
+    │   └── route.ts
+    └── [id]/
+        └── route.ts
 ```
 
-Without global `turbo`, use your package manager:
+Knit generates:
 
-```sh
-cd my-turborepo
-npx turbo dev
-pnpm exec turbo dev
-pnpm exec turbo dev
+```ts
+export type RoutePattern = "/profile" | "/profile/[[...docs]]" | "/settings" | "/user/[...slug]" | "/user/[id]";
+
+export type RouteParams = {
+    "/profile": Record<string, never>;
+    "/profile/[[...docs]]": { docs?: string[] };
+    "/settings": Record<string, never>;
+    "/user/[...slug]": { slug: string[] };
+    "/user/[id]": { id: string };
+};
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+### Parameter Types
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+| Segment       | Parameter type          |
+| ------------- | ----------------------- |
+| `[id]`        | `{ id: string }`        |
+| `[...slug]`   | `{ slug: string[] }`    |
+| `[[...docs]]` | `{ docs?: string[] }`   |
+| Static route  | `Record<string, never>` |
 
-```sh
-turbo dev --filter=web
-```
+`Record<string, never>` ensures that static routes cannot accept arbitrary parameters.
 
-Without global `turbo`:
+These generated types provide a type-safe representation of your application's route structure.
 
-```sh
-npx turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+## CLI Commands
 
-### Remote Caching
+| Command          | Description                               |
+| ---------------- | ----------------------------------------- |
+| `pnpm knit init` | Initialize Knit configuration.            |
+| `pnpm knit`      | Start the development watcher.            |
+| `pnpm knit dev`  | Start the development watcher explicitly. |
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+## Roadmap
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+Knit is being developed as an extension of NestJS.
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+The current focus is route discovery and type generation. Future development will introduce filesystem-based runtime routing while retaining NestJS capabilities and architecture.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+## License
 
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-pnpm exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-pnpm exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+MIT

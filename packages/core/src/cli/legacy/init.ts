@@ -1,9 +1,32 @@
-import { access, writeFile } from "fs/promises";
 import * as p from "@clack/prompts";
+import { access, writeFile } from "fs/promises";
 import path from "path";
 
-
-export async function init() {
+/**
+ * Legacy project initialization command.
+ *
+ * This was used when Knit was a standalone route type generator,
+ * allowing users to configure route directories and generated type output.
+ *
+ * Knit has since evolved into a NestJS-based application framework
+ * with project creation handled by `create-knit-app`.
+ *
+ * This implementation is retained for reference and learning purposes
+ * and is no longer registered as an active CLI command.
+ *
+ * ---
+ *
+ * Runs the interactive `knit init` flow.
+ *
+ * Prompts for the project type, source directory, and output directory, and
+ * asks before overwriting an existing `knit.config.ts`. Frontend projects use
+ * `page.tsx` as the route filename; backend projects use `route.ts`. The
+ * resulting configuration is written to the current working directory.
+ *
+ * @returns A promise that resolves when setup finishes or the user cancels.
+ * @throws {Error} If writing the configuration file fails.
+ */
+async function init() {
     p.intro("🧶 Knit · Project setup");
 
     const configPath = path.resolve(process.cwd(), "knit.config.ts");
@@ -91,3 +114,5 @@ export default defineConfig({
 
     p.outro("Knit is ready! Run `pnpm knit` to start watching your routes.");
 }
+
+export { init };
