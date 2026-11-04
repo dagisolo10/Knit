@@ -29,7 +29,11 @@ export function Controller(prefixOrOptions?: string | string[] | ControllerOptio
         const registeredMethods = new Map<number, string>();
 
         for (const name of methods) {
-            const handler = target.prototype[name];
+            const descriptor = Object.getOwnPropertyDescriptor(target.prototype, name);
+
+            if (!descriptor || typeof descriptor.value !== "function") continue;
+
+            const handler = descriptor.value;
 
             if (typeof handler !== "function") continue;
 
