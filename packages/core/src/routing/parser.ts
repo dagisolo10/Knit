@@ -1,5 +1,6 @@
 import path from "path";
 
+
 interface ParsedRouteParam {
     param: Record<string, { value: string; segment: RouteSegment }>;
 }
@@ -68,7 +69,7 @@ function routePatterToTsTypeParams(values: string[]): string {
                 })
                 .join("; ");
 
-            return `\t"${pattern}": { ${properties} }`;
+            return properties ? `\t"${pattern}": { ${properties} }` : `\t"${pattern}": Record<string, never>`;
         })
         .join(";\n")}\n}`;
 

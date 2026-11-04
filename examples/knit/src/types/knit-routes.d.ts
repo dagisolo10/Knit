@@ -10,9 +10,9 @@ export type RoutePattern =
 	| "/user/[id]";
 
 export type RouteParams = {
-	"/profile": {  };
+	"/profile": Record<string, never>;
 	"/profile/[[...docs]]": { docs?: string[] };
-	"/settings": {  };
+	"/settings": Record<string, never>;
 	"/user/[...slug]": { slug: string[] };
 	"/user/[id]": { id: string }
 };

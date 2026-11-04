@@ -10,6 +10,6 @@ program.name("knit").description("File-based routing and type generation for you
 
 program.command("init").description("Initialize Knit in your project").action(init);
 
-program.action(dev);
+program.command("dev", { isDefault: true }).description("Watch routes and generate types").action(dev);
 
 program.parseAsync(process.argv);
