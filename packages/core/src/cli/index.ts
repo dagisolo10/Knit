@@ -4,12 +4,12 @@ import { dev } from "./dev.js";
 
 const program = new Command();
 
-program.name("knit").description("File-based routing and type generation for your applications");
+program.name("knit").description("File-based routing for NestJS applications");
 
-program.command("dev").description("Watch routes and generate types").action(dev);
+program.command("dev").description("Start the application and restart it when source files change").action(dev);
 
 program.action(() => {
-    console.error("No command specified. Run `knit dev` to watch routes and generate types.");
+    console.error("No command specified. Run `knit dev` to start the development server.");
     process.exitCode = 1;
 });
 

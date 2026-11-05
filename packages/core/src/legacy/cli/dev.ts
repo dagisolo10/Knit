@@ -3,8 +3,8 @@ import { access, writeFile } from "fs/promises";
 import path from "path";
 
 import { createCliColors } from "../../cli/cli-colors.js";
-import { type KnitConfig, loadConfig } from "../../config.js";
-import { watchRoutes } from "../../routing/watcher.js";
+import { loadConfig, type ResolvedKnitConfig } from "../../config.js";
+import { watchPaths } from "../../routing/watcher.js";
 import { DEFAULT_OUT_FILE, generateRouteTypes } from "../routing/generate-route-types.js";
 
 const pc = createCliColors();
@@ -14,7 +14,7 @@ const pc = createCliColors();
  *
  * @param config - Loaded Knit configuration.
  */
-async function generate(config: KnitConfig) {
+async function generate(config: ResolvedKnitConfig) {
     const changed = await generateRouteTypes(config);
 
     if (changed) {
@@ -93,7 +93,7 @@ export default defineConfig({
 
     await generate(config);
 
-    watchRoutes(config.srcDir, async () => await generate(config));
+    watchPaths({ directories: [config.srcDir] }, async () => await generate(config));
 
     p.outro("Watching for route changes...");
 }
