@@ -3,7 +3,7 @@ import { stat } from "fs/promises";
 import path from "path";
 
 import { generateConfigFile, loadConfig, type ResolvedKnitConfig } from "../config.js";
-import { watchPaths, type WatchTargets } from "../routing/watcher.js";
+import { watchPaths, type WatchHandle, type WatchTargets } from "../routing/watcher.js";
 import { startApplication, stopApplication } from "./child-process.js";
 import { createCliColors } from "./cli-colors.js";
 
@@ -36,28 +36,35 @@ export async function dev() {
     let restart = Promise.resolve();
     let shuttingDown = false;
 
-    const watcher = watchPaths(getWatchTargets(config), () => {
-        if (shuttingDown) return;
+    let watcher: WatchHandle;
 
-        console.clear();
-        logBanner(true);
+    try {
+        watcher = watchPaths(getWatchTargets(config), () => {
+            if (shuttingDown) return;
 
-        restart = restart
-            .then(async () => {
-                if (shuttingDown) return;
+            console.clear();
+            logBanner(true);
 
-                await stopApplication(child);
+            restart = restart
+                .then(async () => {
+                    if (shuttingDown) return;
 
-                if (shuttingDown) return;
+                    await stopApplication(child);
 
-                child = startApplication(config.entryFile);
-            })
-            .catch((error: unknown) => {
-                console.error("[KNIT] Failed to restart application:", error);
-            });
+                    if (shuttingDown) return;
 
-        return restart;
-    });
+                    child = startApplication(config.entryFile);
+                })
+                .catch((error: unknown) => {
+                    console.error("[KNIT] Failed to restart application:", error);
+                });
+
+            return restart;
+        });
+    } catch (error) {
+        await stopApplication(child);
+        throw error;
+    }
 
     const shutdown = async () => {
         if (shuttingDown) return;
