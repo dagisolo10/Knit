@@ -25,7 +25,7 @@ interface LoadedRoute extends DiscoveredRoute {
 export async function loadRoutes(srcDir: string): Promise<LoadedRoute[]> {
     const routes = await scanRoutes(srcDir);
 
-    const sortedRoutes = Array.from(routes).sort((a, b) => a.routePath.localeCompare(b.routePath));
+    const sortedRoutes = Array.from(routes).sort((a, b) => compareRoutePaths(a.routePath, b.routePath));
 
     const loadedRoutes: LoadedRoute[] = [];
 
@@ -38,4 +38,22 @@ export async function loadRoutes(srcDir: string): Promise<LoadedRoute[]> {
     }
 
     return loadedRoutes;
+}
+
+function compareRoutePaths(a: string, b: string): number {
+    const aSegments = a.split("/").filter(Boolean);
+    const bSegments = b.split("/").filter(Boolean);
+
+    for (let i = 0; i < Math.min(aSegments.length, bSegments.length); i++) {
+        const aSegment = aSegments[i]!;
+        const bSegment = bSegments[i]!;
+
+        const aDynamic = aSegment.startsWith(":");
+        const bDynamic = bSegment.startsWith(":");
+
+        if (aDynamic !== bDynamic) return aDynamic ? 1 : -1;
+        if (aSegment !== bSegment) return aSegment < bSegment ? -1 : 1;
+    }
+
+    return aSegments.length - bSegments.length;
 }
