@@ -1,10 +1,9 @@
 import { mkdirSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 
-import { generateTypeAlias, parseRoute, routePatternsToTsTypePatters, routePatterToTsTypeParams } from "../routing/parser.js";
-import { scanRoutes } from "../routing/scanner.js";
-import type { KnitConfig } from "../config.js";
-
+import type { KnitConfig } from "../../config.js";
+import { scanRoutes } from "../../routing/scanner.js";
+import { generateTypeAlias, parseRoute, routePatternsToTsTypePatters, routePatterToTsTypeParams } from "./parser.js";
 
 /** Default filename for the generated route declaration file. */
 const DEFAULT_OUT_FILE = "knit-routes.d.ts";
@@ -22,8 +21,9 @@ const DEFAULT_OUT_FILE = "knit-routes.d.ts";
  * @throws {Error} If scanning route files or creating/writing the output fails.
  */
 async function generateRouteTypes(config: KnitConfig): Promise<boolean> {
-    const files = await scanRoutes(config.srcDir, config.routeFile);
-    const routes = files.map((file) => parseRoute(file, config.srcDir));
+    const files = await scanRoutes(config.srcDir);
+
+    const routes = files.map((route) => parseRoute(route.filePath, config.srcDir));
 
     const sortedPatterns = Array.from(routes).sort();
 
@@ -39,9 +39,13 @@ ${generateTypeAlias("RoutePattern", routePatterns)}
 ${generateTypeAlias("RouteParams", routeParams)}
 `;
 
-    mkdirSync(config.outDir, { recursive: true });
+    /**
+     * Used config.outDir
+     */
+    const outDir = "./src/types";
+    mkdirSync(outDir, { recursive: true });
 
-    return writeFileIfChanged(path.join(config.outDir, DEFAULT_OUT_FILE), content);
+    return writeFileIfChanged(path.join(outDir, DEFAULT_OUT_FILE), content);
 }
 
 /**

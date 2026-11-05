@@ -1,6 +1,14 @@
+import "reflect-metadata";
+
 /**
  * Public entry point for `@knit/core`.
- *
- * Re-exports the configuration API used by `knit.config.ts`.
  */
-export * from "./config.js";
+
+// Factory
+export { KnitFactory } from "./knit-factory.js";
+
+// Configuration
+export { defineConfig, type KnitConfig } from "./config.js";
+
+// Common
+export * from "./common/index.js";

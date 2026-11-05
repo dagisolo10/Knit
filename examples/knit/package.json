@@ -4,12 +4,13 @@
     "version": "1.0.0",
     "scripts": {
         "build": "tsc",
-        "knit": "pnpm exec knit",
+        "knit": "clear && pnpm exec knit",
         "dev:build": "tsc --watch"
     },
     "license": "ISC",
     "dependencies": {
-        "@knit/core": "workspace:*"
+        "@knit/core": "workspace:*",
+        "@nestjs/platform-express": "^12.3.2"
     },
     "devDependencies": {
         "@types/node": "^26.6.6",

@@ -17,6 +17,9 @@
         "declaration": true,
         "declarationMap": true,
 
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+
         // Style Options
         "noUnusedLocals": true,
         "noUnusedParameters": true,
