@@ -1,9 +1,8 @@
 import * as p from "@clack/prompts";
-import { access, writeFile } from "fs/promises";
 import path from "path";
 
 import { createCliColors } from "../../cli/cli-colors.js";
-import { loadConfig, type ResolvedKnitConfig } from "../../config.js";
+import { generateConfigFile, loadConfig, type ResolvedKnitConfig } from "../../config.js";
 import { watchPaths } from "../../routing/watcher.js";
 import { DEFAULT_OUT_FILE, generateRouteTypes } from "../routing/generate-route-types.js";
 
@@ -44,33 +43,7 @@ async function generate(config: ResolvedKnitConfig) {
 async function dev() {
     p.intro("🧶 Knit · Development");
 
-    const configPath = path.resolve(process.cwd(), "knit.config.ts");
-
-    try {
-        await access(configPath);
-    } catch (error) {
-        if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-            throw error;
-        }
-
-        const generatedConfig = `import { defineConfig } from "@knit/core";
-
-export default defineConfig({
-    srcDir: "./src/app",
-    outDir: "./src/types",
-    routeFile: "route.ts",
-});
-`;
-
-        try {
-            await writeFile(configPath, generatedConfig, { encoding: "utf-8", flag: "wx" });
-            p.log.success("Created default knit.config.ts");
-        } catch (writeError) {
-            if ((writeError as NodeJS.ErrnoException).code !== "EEXIST") {
-                throw writeError;
-            }
-        }
-    }
+    await generateConfigFile();
 
     const config = await loadConfig();
 

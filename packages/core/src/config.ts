@@ -60,7 +60,7 @@ export function defineConfig(config: KnitConfig): KnitConfig {
 /**
  * Default project-relative paths used when a configuration omits a property.
  */
-export const DEFAULT_CONFIG: ResolvedKnitConfig = {
+const DEFAULT_CONFIG: ResolvedKnitConfig = {
     srcDir: "./src/app",
     entryFile: "./src/main.ts",
 };
