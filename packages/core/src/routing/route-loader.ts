@@ -1,6 +1,7 @@
 import { pathToFileURL } from "url";
 
 import { routeContext } from "./context/route.context.js";
+import { routePathToTsTypeParam } from "./parser.js";
 import { scanRoutes, type DiscoveredRoute } from "./scanner.js";
 
 /**
@@ -32,7 +33,13 @@ export async function loadRoutes(srcDir: string): Promise<LoadedRoute[]> {
     for (const route of sortedRoutes) {
         const importFile = () => import(pathToFileURL(route.filePath).href);
 
-        const exports = await routeContext.run({ path: route.routePath }, importFile);
+        const exports = await routeContext.run(
+            {
+                path: route.routePath,
+                param: routePathToTsTypeParam(route.routePath),
+            },
+            importFile,
+        );
 
         loadedRoutes.push({ ...route, exports });
     }

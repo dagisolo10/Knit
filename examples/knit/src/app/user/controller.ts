@@ -4,7 +4,6 @@ import { Get, KnitController } from "@knit/core";
 export class UserController {
     @Get()
     getUser() {
-        console.log(UserController.name, "IT FREAK'IN WORKS");
         return { message: "IT FREAK'IN WORKS" };
     }
 }

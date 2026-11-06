@@ -25,3 +25,18 @@ export function parseRoute(filePath: string, srcDir: string): string {
         })
         .join("/")}`;
 }
+
+/**
+ * Accumulates parameter definitions while building the `RouteParams` type for
+ * a single route pattern.
+ */
+export type ParsedRouteParam = string[] | null;
+
+export function routePathToTsTypeParam(routePath: string): ParsedRouteParam {
+    const params = routePath
+        .split("/")
+        .filter((segment) => segment.startsWith(":"))
+        .map((segment) => segment.slice(1));
+
+    return params.length > 0 ? params : null;
+}
