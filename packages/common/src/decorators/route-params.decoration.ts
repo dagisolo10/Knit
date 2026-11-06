@@ -1,6 +1,6 @@
 import { Param, type ParameterDecoratorOptions, type PipeTransform, type Type } from "@nestjs/common";
 
-import { routeContext } from "../../routing/context/route.context.js";
+import { routeContext } from "../route-context.js";
 
 /**
  * Route-aware parameter decorator for Knit.

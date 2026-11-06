@@ -10,6 +10,7 @@
     "license": "ISC",
     "dependencies": {
         "@knit/core": "workspace:*",
+        "@knit/common": "workspace:*",
         "@nestjs/platform-express": "^12.3.2"
     },
     "devDependencies": {

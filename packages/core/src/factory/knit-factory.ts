@@ -1,9 +1,9 @@
-import type { INestApplication, NestApplicationOptions, Type } from "@nestjs/common";
+import type { INestApplication, NestApplicationOptions, Type } from "@knit/common";
 import { NestFactory } from "@nestjs/core";
 
-import { loadConfig } from "./config.js";
-import { KnitModule } from "./knit.module.js";
-import { loadRoutes } from "./routing/route-loader.js";
+import { loadConfig } from "../config.js";
+import { KnitModule } from "../module/knit.module.js";
+import { loadRoutes } from "../routing/route-loader.js";
 
 export class KnitFactory {
     static async create(options?: NestApplicationOptions): Promise<INestApplication> {

@@ -1,6 +1,6 @@
 import { pathToFileURL } from "url";
 
-import { routeContext } from "./context/route.context.js";
+import { routeContext } from "@knit/common";
 import { routePathToTsTypeParam } from "./parser.js";
 import { scanRoutes, type DiscoveredRoute } from "./scanner.js";
 

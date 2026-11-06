@@ -1,4 +1,7 @@
-export * from "@nestjs/common";
-
-export * from "./decorators/index.js";
-export * from "./exceptions/index.js";
+/**
+ * Re-exports all symbols from `@knit/common` for backward compatibility.
+ *
+ * Code that previously imported decorators, exceptions, or NestJS common
+ * symbols from `@knit/core` will continue to work.
+ */
+export * from "@knit/common";

@@ -25,14 +25,28 @@ export async function generateFile(relativeSrcDir: string, routePath: string, re
     if (isModule) {
         const controllerPath = path.join(targetDir, "controller.ts");
         const content = generateContent(routePath, "controller");
-        await writeFile(controllerPath, content, "utf8");
-        createdFiles.push(controllerPath);
+        try {
+            await writeFile(controllerPath, content, { encoding: "utf8", flag: "wx" });
+            createdFiles.push(controllerPath);
+        } catch (error: any) {
+            if (error.code === "EEXIST") {
+                throw new Error(`Controller already exists at:\n ${controllerPath}\nSkip generating the controller or remove the existing file first.`);
+            }
+            throw error;
+        }
     }
 
     const filePath = path.join(targetDir, isModule ? `${routePath}.module.ts` : "controller.ts");
     const content = generateContent(routePath, resourceType);
-    await writeFile(filePath, content, "utf8");
-    createdFiles.push(filePath);
+    try {
+        await writeFile(filePath, content, { encoding: "utf8", flag: "wx" });
+        createdFiles.push(filePath);
+    } catch (error: any) {
+        if (error.code === "EEXIST") {
+            throw new Error(`File already exists at:\n ${filePath}\nSkip generating or remove the existing file first.`);
+        }
+        throw error;
+    }
 
     return createdFiles;
 }
@@ -51,7 +65,7 @@ function generateContent(routePath: string, type: Type): string {
     const isController = isType(type, ["controller", "co"]);
 
     if (isController) {
-        const controllerContent = `import { KnitController } from "@knit/core";
+        const controllerContent = `import { KnitController } from "@knit/common";
 
 @KnitController()
 export class ${controller} {}
@@ -60,7 +74,7 @@ export class ${controller} {}
         return controllerContent;
     }
 
-    const moduleContent = `import { Module } from "@knit/core";
+    const moduleContent = `import { Module } from "@knit/common";
 import { ${controller} } from "./controller.js";
 
 @Module({

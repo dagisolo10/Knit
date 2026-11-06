@@ -1,6 +1,10 @@
 import { AsyncLocalStorage } from "async_hooks";
 
-import type { ParsedRouteParam } from "../parser.js";
+/**
+ * Accumulates parameter definitions while building the `RouteParams` type for
+ * a single route pattern.
+ */
+export type ParsedRouteParam = string[] | null;
 
 export interface RouteContext {
     path: string;

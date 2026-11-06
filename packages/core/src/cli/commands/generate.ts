@@ -105,7 +105,14 @@ export async function generateRouteCommand(args: GeneratorArguments) {
         }
     }
 
-    const createdFiles = await generateFile(relativeSrcDir, routePath, resourceType);
+    let createdFiles: string[];
+
+    try {
+        createdFiles = await generateFile(relativeSrcDir, routePath, resourceType);
+    } catch (error) {
+        abortGeneration(spinner, pc, error instanceof Error ? error.message : String(error), "Cannot generate files");
+    }
+
     const updatedFiles: string[] = [];
 
     if (isController) {

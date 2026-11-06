@@ -1,0 +1,26 @@
+{
+    "name": "@knit/common",
+    "version": "0.0.1",
+    "type": "module",
+    "license": "ISC",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "scripts": {
+        "build": "tsc",
+        "dev:build": "tsc --watch"
+    },
+    "devDependencies": {
+        "@types/node": "^26.6.6",
+        "typescript": "^7.0.2"
+    },
+    "dependencies": {
+        "@nestjs/common": "^12.3.2",
+        "reflect-metadata": "^0.2.2"
+    }
+}

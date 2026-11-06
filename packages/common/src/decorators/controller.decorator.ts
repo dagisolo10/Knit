@@ -1,7 +1,7 @@
 import { Controller, RequestMethod, type ControllerOptions } from "@nestjs/common";
 import { METHOD_METADATA } from "@nestjs/common/constants";
 
-import { routeContext } from "../../routing/context/route.context.js";
+import { routeContext } from "../route-context.js";
 import { DuplicateRouteMethodException } from "../exceptions/duplicate-route-method.exception.js";
 
 export type KnitControllerOptions = Omit<ControllerOptions, "path">;
