@@ -1,4 +1,5 @@
 import * as p from "@clack/prompts";
+import { rm } from "fs/promises";
 import path from "path";
 
 import { loadConfig } from "../../config.js";
@@ -94,7 +95,7 @@ export async function generateRouteCommand(args: GeneratorArguments) {
         const moduleExists = await rootModuleCheck(relativeSrcDir, routePath);
         if (!moduleExists) {
             const rootFeatureName = getRootSegment(routePath);
-            abortGeneration(spinner, pc, `Feature module required. Create feature module first.\npnpm knit g module ${rootFeatureName}`, "Cannot create Controller");
+            abortGeneration(spinner, pc, `Feature module required. Create feature module first.\npnpm knit g module /${rootFeatureName}`, "Cannot create Controller");
         }
 
         const collides = await fileCollides(relativeSrcDir, routePath);
@@ -108,8 +109,13 @@ export async function generateRouteCommand(args: GeneratorArguments) {
     const updatedFiles: string[] = [];
 
     if (isController) {
-        const updatedFile = await registerControllerInModule(relativeSrcDir, routePath);
-        updatedFiles.push(updatedFile);
+        try {
+            const updatedFile = await registerControllerInModule(relativeSrcDir, routePath);
+            updatedFiles.push(updatedFile);
+        } catch (error) {
+            await Promise.all(createdFiles.map((file) => rm(file, { force: true })));
+            abortGeneration(spinner, pc, error instanceof Error ? error.message : String(error), "Cannot register Controller");
+        }
     }
 
     spinner.stop(`Generation complete!`);

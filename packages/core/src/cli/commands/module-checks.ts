@@ -1,4 +1,3 @@
-import * as p from "@clack/prompts";
 import { access, readFile, writeFile } from "fs/promises";
 import path from "path";
 
@@ -100,26 +99,107 @@ async function updateFeatureModule(moduleFilePath: string, newControllerClassNam
         return;
     }
 
-    const importPattern = /^import[\s\S]*?;\s*$/gm;
-    let lastImportEnd = 0;
-
-    for (const match of content.matchAll(importPattern)) {
-        lastImportEnd = match.index + match[0].length;
-    }
-
+    const lastImportEnd = findLastImportEnd(content);
     let updatedContent = lastImportEnd > 0 ? content.slice(0, lastImportEnd) + importStatement + "\n" + content.slice(lastImportEnd) : importStatement + "\n" + content;
 
-    const controllersMatch = updatedContent.match(/controllers:\s*\[([\s\S]*?)\]/);
+    const controllersPattern = /controllers:\s*\[([\s\S]*?)\]/;
+    const controllersMatch = updatedContent.match(controllersPattern);
 
     if (controllersMatch) {
         const existingControllers = controllersMatch[1]!.trim();
         const separator = existingControllers.length > 0 && !existingControllers.endsWith(",") ? ", " : "";
 
         const newControllersArray = `controllers: [${existingControllers}${separator}${newControllerClassName}]`;
-        updatedContent = updatedContent.replace(/controllers:\s*\[([\s\S]*?)\]/, () => newControllersArray);
+        updatedContent = updatedContent.replace(controllersPattern, () => newControllersArray);
     } else {
-        p.log.warn(`Could not find a "controllers" array in ${moduleFilePath}. Register ${newControllerClassName} manually.`);
+        updatedContent = addControllersMetadata(updatedContent, newControllerClassName, moduleFilePath);
     }
 
     await writeFile(moduleFilePath, updatedContent, "utf8");
 }
+
+/**
+ * Adds a `controllers` property to an existing `@Module` decorator when the module
+ * does not declare one yet.
+ *
+ * @param content - The module source text
+ * @param newControllerClassName - The controller class name to register
+ * @param moduleFilePath - The module file path, used for error messages
+ * @returns The updated module source text
+ */
+function addControllersMetadata(content: string, newControllerClassName: string, moduleFilePath: string): string {
+    const modulePattern = /@Module\s*\(\s*\{([\s\S]*?)\}\s*\)/;
+    const moduleMatch = content.match(modulePattern);
+
+    if (!moduleMatch) {
+        throw new Error(`Could not find an @Module decorator in ${moduleFilePath}. Add ${newControllerClassName} to the module's controllers manually.`);
+    }
+
+    const body = moduleMatch[1]!;
+    const indent = body.match(/\n([ \t]+)\S/)?.[1] ?? "    ";
+    const trimmedBody = body.trimEnd();
+    const hasProperties = trimmedBody.trim().length > 0;
+    const separator = hasProperties && !trimmedBody.endsWith(",") ? "," : "";
+    const controllerProperty = `\n${indent}controllers: [${newControllerClassName}],`;
+    const newBody = hasProperties ? `${trimmedBody}${separator}${controllerProperty}\n` : `${controllerProperty}\n`;
+
+    return content.replace(modulePattern, () => `@Module({${newBody}})`);
+}
+
+/**
+ * Finds the character offset immediately after the last top-level import declaration.
+ *
+ * The scan is line-based and tracks brace depth, so multi-line imports are handled
+ * without letting the match extend into later declarations. Semicolonless imports
+ * are supported because a declaration also ends when its braces close.
+ *
+ * @param content - The full source text of a module
+ * @returns The offset after the last import declaration, or `0` when none are present
+ */
+function findLastImportEnd(content: string): number {
+    const lines = content.split("\n");
+
+    let offset = 0;
+    let lastImportEnd = 0;
+    let inImport = false;
+    let braceDepth = 0;
+
+    for (const line of lines) {
+        const lineEnd = offset + line.length + 1;
+        const trimmed = line.trim();
+
+        if (!inImport) {
+            if (/^import\s/.test(trimmed)) {
+                inImport = true;
+                braceDepth = countChar(line, "{") - countChar(line, "}");
+
+                if (braceDepth === 0) {
+                    lastImportEnd = lineEnd;
+                    inImport = false;
+                }
+            }
+        } else {
+            braceDepth += countChar(line, "{") - countChar(line, "}");
+
+            if (braceDepth <= 0) {
+                lastImportEnd = lineEnd;
+                inImport = false;
+            }
+        }
+
+        offset = lineEnd;
+    }
+
+    return lastImportEnd;
+}
+
+function countChar(value: string, char: string): number {
+    let count = 0;
+
+    for (const current of value) {
+        if (current === char) count++;
+    }
+
+    return count;
+}
+
