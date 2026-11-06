@@ -34,7 +34,7 @@ export type ParsedRouteParam = string[] | null;
 
 export function routePathToTsTypeParam(routePath: string): ParsedRouteParam {
     const params = routePath
-        .split(path.sep)
+        .split("/")
         .filter((segment) => segment.startsWith(":"))
         .map((segment) => segment.slice(1));
 

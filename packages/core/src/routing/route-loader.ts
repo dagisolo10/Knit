@@ -1,4 +1,3 @@
-import path from "path";
 import { pathToFileURL } from "url";
 
 import { routeContext } from "./context/route.context.js";
@@ -49,8 +48,8 @@ export async function loadRoutes(srcDir: string): Promise<LoadedRoute[]> {
 }
 
 function compareRoutePaths(a: string, b: string): number {
-    const aSegments = a.split(path.sep).filter(Boolean);
-    const bSegments = b.split(path.sep).filter(Boolean);
+    const aSegments = a.split("/").filter(Boolean);
+    const bSegments = b.split("/").filter(Boolean);
 
     for (let i = 0; i < Math.min(aSegments.length, bSegments.length); i++) {
         const aSegment = aSegments[i]!;

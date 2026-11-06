@@ -72,7 +72,7 @@ function routePatterToTsTypeParams(values: string[]): string {
     const routesMap = new Map<string, ParsedRouteParam>();
 
     for (const pattern of values) {
-        const paths = pattern.split(path.sep);
+        const paths = pattern.split("/");
 
         if (!pattern.startsWith("[") && !pattern.endsWith("]")) {
             routesMap.set(pattern, { param: {} });

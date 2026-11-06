@@ -1,4 +1,4 @@
-import { Command } from "commander";
+import { Argument, Command } from "commander";
 
 import { generateRouteCommand } from "./commands/generate.js";
 import type { Type } from "./commands/types.js";
@@ -16,7 +16,7 @@ program
     .command("generate")
     .alias("g")
     .description("Generate a feature module or nested sub-controller")
-    .argument("[type]", "Type of resource to generate ('module'/'mo' or 'controller'/'co')")
+    .addArgument(new Argument("[type]", "Type of resource to generate ('module'/'mo' or 'controller'/'co')").choices(["module", "mo", "controller", "co"]))
     .argument("[name]", "Route path specification (e.g., /users or /users/[id])")
     .action(async (type: Type, name: string) => await generateRouteCommand({ resourceType: type, name }));
 

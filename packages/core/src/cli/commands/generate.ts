@@ -4,9 +4,9 @@ import path from "path";
 import { loadConfig } from "../../config.js";
 import { createCliColors } from "../cli-colors.js";
 import { generateFile } from "./file-generation.js";
-import { fileCollides, rootModuleCheck, subPathModuleRestriction } from "./module-checks.js";
+import { fileCollides, registerControllerInModule, rootModuleCheck, subPathModuleRestriction } from "./module-checks.js";
 import type { GeneratorArguments, ResourceTypeOptions, Type } from "./types.js";
-import { abortGeneration, capitalize, isType, isValidRoutePath } from "./utils.js";
+import { abortGeneration, capitalize, getRootSegment, isType, isValidRoutePath } from "./utils.js";
 
 /**
  * Main execution handler for the Knit code generator route command.
@@ -59,6 +59,17 @@ export async function generateRouteCommand(args: GeneratorArguments) {
         routePath = result;
     }
 
+    const validTypes: Type[] = ["controller", "co", "module", "mo"];
+    if (!validTypes.includes(resourceType)) {
+        p.cancel(`Unknown resource type "${resourceType}". Use module/mo or controller/co.`);
+        process.exit(1);
+    }
+
+    if (!isValidRoutePath(routePath)) {
+        p.cancel(`Invalid route path "${routePath}". It must start with '/' and use alphanumeric segments or bracketed params.`);
+        process.exit(1);
+    }
+
     const spinner = p.spinner();
     spinner.start(`Generating ${resourceType} for "${routePath}"...`);
 
@@ -73,7 +84,7 @@ export async function generateRouteCommand(args: GeneratorArguments) {
 
         const moduleExists = await rootModuleCheck(relativeSrcDir, routePath);
         if (moduleExists) {
-            const rootFeatureName = capitalize(routePath.split(path.sep)[0]!);
+            const rootFeatureName = capitalize(getRootSegment(routePath));
             abortGeneration(spinner, pc, `${rootFeatureName} module already exists.`, "Cannot Create Module");
         }
     }
@@ -82,7 +93,7 @@ export async function generateRouteCommand(args: GeneratorArguments) {
     if (isController) {
         const moduleExists = await rootModuleCheck(relativeSrcDir, routePath);
         if (!moduleExists) {
-            const rootFeatureName = routePath.split(path.sep)[0]!;
+            const rootFeatureName = getRootSegment(routePath);
             abortGeneration(spinner, pc, `Feature module required. Create feature module first.\npnpm knit g module ${rootFeatureName}`, "Cannot create Controller");
         }
 
@@ -94,11 +105,20 @@ export async function generateRouteCommand(args: GeneratorArguments) {
     }
 
     const createdFiles = await generateFile(relativeSrcDir, routePath, resourceType);
+    const updatedFiles: string[] = [];
+
+    if (isController) {
+        const updatedFile = await registerControllerInModule(relativeSrcDir, routePath);
+        updatedFiles.push(updatedFile);
+    }
 
     spinner.stop(`Generation complete!`);
     console.log();
     for (const file of createdFiles) {
         console.log(`  ${pc.green("CREATED")} ${file}`);
+    }
+    for (const file of updatedFiles) {
+        console.log(`  ${pc.blue("UPDATED")} ${file}`);
     }
 
     p.outro(pc.green("✨ All done! Ready for development."));

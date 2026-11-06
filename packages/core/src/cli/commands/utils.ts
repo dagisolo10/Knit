@@ -1,5 +1,4 @@
 import * as p from "@clack/prompts";
-import path from "path";
 
 import { createCliColors } from "../cli-colors.js";
 import type { FullType, Type } from "./types.js";
@@ -28,12 +27,26 @@ export function capitalize(value: string): string {
  */
 export function generateClassName(routePath: string, resourceType: FullType) {
     const name = routePath
-        .split(path.sep)
-        .map((path) => (path.startsWith("[") && path.endsWith("]") ? path.slice(1, path.length - 1) : path))
+        .split("/")
+        .map((segment) => (segment.startsWith("[") && segment.endsWith("]") ? segment.slice(1, -1) : segment))
+        .flatMap((segment) => segment.split(/[-_]+/))
         .map(capitalize)
         .join("");
 
     return capitalize(name) + capitalize(resourceType);
+}
+
+/**
+ * Returns the first non-empty segment of a route path.
+ *
+ * Route paths always use `/` as the delimiter, so this deliberately avoids
+ * the platform-specific `path.sep`.
+ *
+ * @param routePath - The route path to inspect (e.g., "/users/[id]")
+ * @returns The first non-empty segment (e.g., "users"), or an empty string
+ */
+export function getRootSegment(routePath: string): string {
+    return routePath.split("/").filter(Boolean)[0] ?? "";
 }
 
 /**
@@ -44,11 +57,11 @@ export function generateClassName(routePath: string, resourceType: FullType) {
  * @param message - The error message body to display
  * @param title - The title banner for the Clack note block
  */
-export function abortGeneration(spinner: ReturnType<typeof p.spinner>, pc: ReturnType<typeof createCliColors>, message: string, title: string) {
+export function abortGeneration(spinner: ReturnType<typeof p.spinner>, pc: ReturnType<typeof createCliColors>, message: string, title: string): never {
     spinner.stop("Generation failed.");
     p.note(pc.red(message), title);
     p.outro(pc.red("Operation aborted."));
-    process.exit(0);
+    process.exit(1);
 }
 
 /**

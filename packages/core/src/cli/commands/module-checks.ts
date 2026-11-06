@@ -1,7 +1,8 @@
+import * as p from "@clack/prompts";
 import { access, readFile, writeFile } from "fs/promises";
 import path from "path";
 
-import { generateClassName } from "./utils.js";
+import { generateClassName, getRootSegment } from "./utils.js";
 
 /**
  * Validates whether a given route path violates the sub-path module creation restriction.
@@ -27,7 +28,7 @@ export async function subPathModuleRestriction(relativeSrcDir: string, routePath
  * @returns A promise resolving to true if the root module file exists, false otherwise
  */
 export async function rootModuleCheck(relativeSrcDir: string, routePath: string): Promise<boolean> {
-    const routeRootDir = routePath.split(path.sep)[0]!;
+    const routeRootDir = getRootSegment(routePath);
     const routePathRootModulePath = routeRootDir + ".module.ts";
     const targetPath = path.join(relativeSrcDir, routeRootDir, routePathRootModulePath);
 
@@ -41,8 +42,6 @@ export async function rootModuleCheck(relativeSrcDir: string, routePath: string)
 
 /**
  * Checks if a controller file already exists at the target path.
- * If it does not exist, it automatically computes relative import paths and patches
- * the parent feature module to register the new controller.
  *
  * @param relativeSrcDir - The project-relative source directory path (e.g., "src/app")
  * @param routePath - The target route path where the controller is being created
@@ -54,24 +53,34 @@ export async function fileCollides(relativeSrcDir: string, routePath: string): P
     try {
         await access(controllerPath);
         return true;
-    } catch {}
+    } catch {
+        return false;
+    }
+}
 
-    const routeRootDir = routePath.split(path.sep)[0]!;
+/**
+ * Registers a newly generated controller in its root feature module by adding the
+ * controller import and appending its class to the module's `controllers` array.
+ *
+ * Call this only after the controller file has been written successfully.
+ *
+ * @param relativeSrcDir - The project-relative source directory path (e.g., "src/app")
+ * @param routePath - The target route path where the controller was created
+ */
+export async function registerControllerInModule(relativeSrcDir: string, routePath: string): Promise<string> {
+    const controllerPath = path.join(relativeSrcDir, routePath, "controller.ts");
+    const routeRootDir = getRootSegment(routePath);
+
     const routePathRootModulePath = routeRootDir + ".module.ts";
     const moduleFilePath = path.join(relativeSrcDir, routeRootDir, routePathRootModulePath);
 
     const controllerClassName = generateClassName(routePath, "controller");
 
-    const fullControllerImportPath = path.relative(relativeSrcDir, controllerPath);
-    const relativeControllerPath = "./" + fullControllerImportPath.split(path.sep).slice(1, fullControllerImportPath.length).join(path.sep);
-    const relativeControllerImportPath = relativeControllerPath
-        .split(path.sep)
-        .map((path) => (path.includes("controller.ts") ? "controller.js" : path))
-        .join(path.sep);
+    const relativeControllerImportPath = "./" + path.relative(path.join(relativeSrcDir, routeRootDir), controllerPath).split(path.sep).join("/").replace(/\.ts$/, ".js");
 
     await updateFeatureModule(moduleFilePath, controllerClassName, relativeControllerImportPath);
 
-    return false;
+    return moduleFilePath;
 }
 
 /**
@@ -91,10 +100,14 @@ async function updateFeatureModule(moduleFilePath: string, newControllerClassNam
         return;
     }
 
-    const lastImportIndex = content.lastIndexOf("import ");
-    const nextNewlineAfterImport = content.indexOf("\n", lastImportIndex);
+    const importPattern = /^import[\s\S]*?;\s*$/gm;
+    let lastImportEnd = 0;
 
-    let updatedContent = content.slice(0, nextNewlineAfterImport + 1) + importStatement + "\n" + content.slice(nextNewlineAfterImport + 1);
+    for (const match of content.matchAll(importPattern)) {
+        lastImportEnd = match.index + match[0].length;
+    }
+
+    let updatedContent = lastImportEnd > 0 ? content.slice(0, lastImportEnd) + importStatement + "\n" + content.slice(lastImportEnd) : importStatement + "\n" + content;
 
     const controllersMatch = updatedContent.match(/controllers:\s*\[([\s\S]*?)\]/);
 
@@ -103,7 +116,9 @@ async function updateFeatureModule(moduleFilePath: string, newControllerClassNam
         const separator = existingControllers.length > 0 && !existingControllers.endsWith(",") ? ", " : "";
 
         const newControllersArray = `controllers: [${existingControllers}${separator}${newControllerClassName}]`;
-        updatedContent = updatedContent.replace(/controllers:\s*\[([\s\S]*?)\]/, newControllersArray);
+        updatedContent = updatedContent.replace(/controllers:\s*\[([\s\S]*?)\]/, () => newControllersArray);
+    } else {
+        p.log.warn(`Could not find a "controllers" array in ${moduleFilePath}. Register ${newControllerClassName} manually.`);
     }
 
     await writeFile(moduleFilePath, updatedContent, "utf8");
