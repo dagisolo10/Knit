@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "fs/promises";
+import { mkdir, rm, writeFile } from "fs/promises";
 import path from "path";
 
 import type { Type } from "./types.js";
@@ -29,6 +29,7 @@ export async function generateFile(relativeSrcDir: string, routePath: string, re
             await writeFile(controllerPath, content, { encoding: "utf8", flag: "wx" });
             createdFiles.push(controllerPath);
         } catch (error: any) {
+            await Promise.allSettled(createdFiles.map((file) => rm(file, { force: true })));
             if (error.code === "EEXIST") {
                 throw new Error(`Controller already exists at:\n ${controllerPath}\nSkip generating the controller or remove the existing file first.`);
             }

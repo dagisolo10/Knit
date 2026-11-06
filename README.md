@@ -2,7 +2,12 @@
 
 **Type-safe file-based routing for NestJS.**
 
-Knit maps your directory structure to NestJS controller routes while preserving the NestJS programming model. Controllers are still normal Nest controllers; Knit discovers them, derives their route paths, and registers them in a generated application module.
+Knit maps your directory structure to NestJS controller routes while preserving the NestJS programming model. It provides a thin layer over NestJS that automatically discovers controllers from your filesystem, derives their route paths from directory names, and bootstraps the application — all without manual module wiring.
+
+The project is split into two packages:
+
+- **`@knit/common`** — Public decorators (`@KnitController`, `@KnitParam`), exceptions, and re-exports of all `@nestjs/common` symbols.
+- **`@knit/core`** — Application factory (`KnitFactory`), dynamic module container, file-system route loader, CLI commands, and code generators.
 
 ## Features
 
@@ -11,7 +16,8 @@ Knit maps your directory structure to NestJS controller routes while preserving 
 - **Dynamic routes** — Directory names such as `[id]` become route parameters like `:id`.
 - **Development watcher** — Restart the application when the entry point or source files change.
 - **Configurable** — Configure the source directory and application entry point.
-- **CLI** — Start the development workflow with one command.
+- **CLI code generators** — Scaffold controllers and modules with `knit generate`.
+- **Two-package architecture** — `@knit/common` for decorators and types, `@knit/core` for the runtime and tooling.
 
 ## Getting Started
 
@@ -51,10 +57,11 @@ Bracketed directory names are passed to NestJS as route parameters. Each `contro
 
 ## Application Entry Point
 
-Knit does not own the application bootstrap. The entry point creates the Nest application through `KnitFactory` and listens on a port:
+Knit does not own the application bootstrap. The entry point creates the Nest application through `KnitFactory` from `@knit/core` and listens on a port:
 
 ```ts
-import { KnitFactory, Logger } from "@knit/core";
+import { KnitFactory } from "@knit/core";
+import { Logger } from "@knit/common";
 
 async function bootstrap() {
     const app = await KnitFactory.create();
@@ -72,10 +79,10 @@ V1 expects an ESM-compatible entry point, so the example project uses `"type": "
 
 ## Controllers
 
-Controllers use the standard NestJS decorators plus `@KnitController()`:
+Controllers use the standard NestJS decorators (re-exported from `@knit/common`) plus `@KnitController()`:
 
 ```ts
-import { Get, KnitController, Param } from "@knit/core";
+import { Get, KnitController, Param } from "@knit/common";
 
 @KnitController()
 export class UserController {

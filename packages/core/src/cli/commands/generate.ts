@@ -80,7 +80,12 @@ export async function generateRouteCommand(args: GeneratorArguments) {
     if (isModule) {
         const isSubPath = await subPathModuleRestriction(relativeSrcDir, routePath);
         if (isSubPath) {
-            abortGeneration(spinner, pc, `Architectural violation: Modules can only be created at the root feature level.\nNested sub-modules like '${routePath}' are not allowed in V1.`, "Cannot Create Module");
+            abortGeneration(
+                spinner,
+                pc,
+                `Architectural violation: Modules can only be created at the root feature level.\nNested sub-modules like '${routePath}' are not allowed in V1.`,
+                "Cannot Create Module",
+            );
         }
 
         const moduleExists = await rootModuleCheck(relativeSrcDir, routePath);
@@ -120,7 +125,7 @@ export async function generateRouteCommand(args: GeneratorArguments) {
             const updatedFile = await registerControllerInModule(relativeSrcDir, routePath);
             updatedFiles.push(updatedFile);
         } catch (error) {
-            await Promise.all(createdFiles.map((file) => rm(file, { force: true })));
+            await Promise.allSettled(createdFiles.map((file) => rm(file, { force: true })));
             abortGeneration(spinner, pc, error instanceof Error ? error.message : String(error), "Cannot register Controller");
         }
     }

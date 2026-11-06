@@ -6,4 +6,3 @@ import { UsersController } from "./controller.js";
     controllers: [UsersController],
 })
 export class UsersModule {}
-
