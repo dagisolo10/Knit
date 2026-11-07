@@ -1,4 +1,4 @@
-import { KnitFactory, Logger } from "@knit/core";
+import { KnitFactory, Logger } from "@knitjs/core";
 
 async function bootstrap() {
     const app = await KnitFactory.create();

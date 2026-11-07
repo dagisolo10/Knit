@@ -5,8 +5,8 @@
 
         "target": "es2020",
         "types": ["node"],
-        "module": "esnext",
-        "moduleResolution": "bundler",
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
 
         // Other Outputs
         "sourceMap": true,

@@ -1,4 +1,4 @@
-import { KnitController } from "@knit/common";
+import { KnitController } from "@knitjs/common";
 
 @KnitController()
 export class UsersController {}

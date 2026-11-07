@@ -1,7 +1,7 @@
 import "reflect-metadata";
 
 /**
- * Public entry point for `@knit/common`.
+ * Public entry point for `@knitjs/common`.
  *
  * Re-exports all NestJS common symbols, as well as Knit-specific decorators,
  * exceptions, and the route context infrastructure.

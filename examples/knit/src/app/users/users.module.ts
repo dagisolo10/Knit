@@ -1,4 +1,5 @@
-import { Module } from "@knit/common";
+import { Module } from "@knitjs/common";
+
 import { UsersController } from "./controller.js";
 
 @Module({

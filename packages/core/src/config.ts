@@ -136,7 +136,7 @@ export async function generateConfigFile() {
             throw error;
         }
 
-        const generatedConfig = `import { defineConfig } from "@knit/core";
+        const generatedConfig = `import { defineConfig } from "@knitjs/core";
 
 export default defineConfig({
     srcDir: "./src/app",

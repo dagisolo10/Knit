@@ -1,3 +1,3 @@
-import { defineConfig } from "@knit/core";
+import { defineConfig } from "@knitjs/core";
 
 export default defineConfig({});

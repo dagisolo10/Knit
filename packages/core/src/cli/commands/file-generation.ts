@@ -66,7 +66,7 @@ function generateContent(routePath: string, type: Type): string {
     const isController = isType(type, ["controller", "co"]);
 
     if (isController) {
-        const controllerContent = `import { KnitController } from "@knit/common";
+        const controllerContent = `import { KnitController } from "@knitjs/common";
 
 @KnitController()
 export class ${controller} {}
@@ -75,7 +75,7 @@ export class ${controller} {}
         return controllerContent;
     }
 
-    const moduleContent = `import { Module } from "@knit/common";
+    const moduleContent = `import { Module } from "@knitjs/common";
 import { ${controller} } from "./controller.js";
 
 @Module({

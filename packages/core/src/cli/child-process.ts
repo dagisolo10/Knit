@@ -7,7 +7,7 @@ const TSX_LOADER = import.meta.resolve("tsx");
  * Starts the configured application entry point in a child process.
  *
  * The child runs through Node's `--import` hook using the `tsx` loader resolved
- * from `@knit/core`, so the application does not need to install `tsx` itself.
+ * from `@knitjs/core`, so the application does not need to install `tsx` itself.
  * The child inherits the parent's stdio, which keeps terminal output and
  * interactive shutdown behavior consistent with the dev command.
  *

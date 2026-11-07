@@ -1,10 +1,14 @@
 {
-    "name": "@knit/common",
+    "name": "@knitjs/common",
     "version": "0.0.1",
+    "description": "Shared decorators and utilities for Knit applications",
     "type": "module",
     "license": "ISC",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
+    "publishConfig": {
+        "access": "public"
+    },
     "exports": {
         ".": {
             "import": "./dist/index.js",

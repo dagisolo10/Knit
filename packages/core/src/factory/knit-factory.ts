@@ -1,4 +1,4 @@
-import type { INestApplication, NestApplicationOptions, Type } from "@knit/common";
+import type { INestApplication, NestApplicationOptions, Type } from "@knitjs/common";
 import { NestFactory } from "@nestjs/core";
 
 import { loadConfig } from "../config.js";

@@ -11,8 +11,8 @@ export const PKG_JSON_TEMPLATE = (projectName: string) =>
                 start: "node dist/main.js",
             },
             dependencies: {
-                "@knit/common": "latest",
-                "@knit/core": "latest",
+                "@knitjs/common": "0.0.1",
+                "@knitjs/core": "0.0.1",
             },
             devDependencies: {
                 "@types/node": "^26.6.6",
@@ -46,12 +46,12 @@ export const TSCONFIG_TEMPLATE = JSON.stringify(
     4,
 );
 
-export const KNIT_CONFIG_TEMPLATE = `import { defineConfig } from "@knit/core";
+export const KNIT_CONFIG_TEMPLATE = `import { defineConfig } from "@knitjs/core";
 
 export default defineConfig({});
 `;
 
-export const MAIN_TS_TEMPLATE = `import { KnitFactory, Logger } from "@knit/core";
+export const MAIN_TS_TEMPLATE = `import { KnitFactory, Logger } from "@knitjs/core";
 
 async function bootstrap() {
     const app = await KnitFactory.create();
@@ -65,7 +65,7 @@ async function bootstrap() {
 await bootstrap();
 `;
 
-export const ROOT_CONTROLLER_TEMPLATE = `import { KnitController, Get } from "@knit/common";
+export const ROOT_CONTROLLER_TEMPLATE = `import { KnitController, Get } from "@knitjs/common";
 
 @KnitController()
 export class RootController {

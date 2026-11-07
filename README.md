@@ -6,8 +6,8 @@ Knit maps your directory structure to NestJS controller routes while preserving 
 
 The project is split into two packages:
 
-- **`@knit/common`** — Public decorators (`@KnitController`, `@KnitParam`), exceptions, and re-exports of all `@nestjs/common` symbols.
-- **`@knit/core`** — Application factory (`KnitFactory`), dynamic module container, file-system route loader, CLI commands, and code generators.
+- **`@knitjs/common`** — Public decorators (`@KnitController`, `@KnitParam`), exceptions, and re-exports of all `@nestjs/common` symbols.
+- **`@knitjs/core`** — Application factory (`KnitFactory`), dynamic module container, file-system route loader, CLI commands, and code generators.
 
 ## Features
 
@@ -17,7 +17,7 @@ The project is split into two packages:
 - **Development watcher** — Restart the application when the entry point or source files change.
 - **Configurable** — Configure the source directory and application entry point.
 - **CLI code generators** — Scaffold controllers and modules with `knit generate`.
-- **Two-package architecture** — `@knit/common` for decorators and types, `@knit/core` for the runtime and tooling.
+- **Two-package architecture** — `@knitjs/common` for decorators and types, `@knitjs/core` for the runtime and tooling.
 
 ## Getting Started
 
@@ -57,11 +57,11 @@ Bracketed directory names are passed to NestJS as route parameters. Each `contro
 
 ## Application Entry Point
 
-Knit does not own the application bootstrap. The entry point creates the Nest application through `KnitFactory` from `@knit/core` and listens on a port:
+Knit does not own the application bootstrap. The entry point creates the Nest application through `KnitFactory` from `@knitjs/core` and listens on a port:
 
 ```ts
-import { KnitFactory } from "@knit/core";
-import { Logger } from "@knit/common";
+import { KnitFactory } from "@knitjs/core";
+import { Logger } from "@knitjs/common";
 
 async function bootstrap() {
     const app = await KnitFactory.create();
@@ -79,10 +79,10 @@ V1 expects an ESM-compatible entry point, so the example project uses `"type": "
 
 ## Controllers
 
-Controllers use the standard NestJS decorators (re-exported from `@knit/common`) plus `@KnitController()`:
+Controllers use the standard NestJS decorators (re-exported from `@knitjs/common`) plus `@KnitController()`:
 
 ```ts
-import { Get, KnitController, Param } from "@knit/common";
+import { Get, KnitController, Param } from "@knitjs/common";
 
 @KnitController()
 export class UserController {
@@ -100,7 +100,7 @@ export class UserController {
 Knit reads `knit.config.ts` from the project root:
 
 ```ts
-import { defineConfig } from "@knit/core";
+import { defineConfig } from "@knitjs/core";
 
 export default defineConfig({
     srcDir: "./src/app",

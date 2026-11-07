@@ -1,4 +1,4 @@
-import { Module, type DynamicModule, type Type } from "@knit/common";
+import { Module, type DynamicModule, type Type } from "@knitjs/common";
 
 @Module({})
 export class KnitModule {

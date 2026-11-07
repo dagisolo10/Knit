@@ -178,10 +178,10 @@ importers:
 
   examples/knit:
     dependencies:
-      '@knit/common':
+      '@knitjs/common':
         specifier: workspace:*
         version: link:../../packages/common
-      '@knit/core':
+      '@knitjs/core':
         specifier: workspace:*
         version: link:../../packages/core
       '@nestjs/platform-express':
@@ -219,7 +219,7 @@ importers:
       '@clack/prompts':
         specifier: ^1.8.1
         version: 1.8.1
-      '@knit/common':
+      '@knitjs/common':
         specifier: workspace:*
         version: link:../common
       '@nestjs/core':

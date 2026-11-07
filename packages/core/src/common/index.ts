@@ -1,7 +1,7 @@
 /**
- * Re-exports all symbols from `@knit/common` for backward compatibility.
+ * Re-exports all symbols from `@knitjs/common` for backward compatibility.
  *
  * Code that previously imported decorators, exceptions, or NestJS common
- * symbols from `@knit/core` will continue to work.
+ * symbols from `@knitjs/core` will continue to work.
  */
-export * from "@knit/common";
+export * from "@knitjs/common";
