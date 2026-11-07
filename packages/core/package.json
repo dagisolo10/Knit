@@ -1,6 +1,6 @@
 {
     "name": "@knitjs/core",
-    "version": "0.0.1",
+    "version": "0.0.5",
     "description": "Core framework and CLI for Knit applications",
     "type": "module",
     "license": "ISC",
