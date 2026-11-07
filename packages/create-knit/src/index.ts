@@ -1,11 +1,32 @@
 #!/usr/bin/env node
 import * as p from "@clack/prompts";
 import { existsSync } from "fs";
-import { mkdir, rm, writeFile } from "fs/promises";
+import { mkdir, readFile, rm, writeFile } from "fs/promises";
 import path from "path";
 import pc from "picocolors";
 
-import { KNIT_CONFIG_TEMPLATE, MAIN_TS_TEMPLATE, PKG_JSON_TEMPLATE, ROOT_CONTROLLER_TEMPLATE, TSCONFIG_TEMPLATE } from "./templates.js";
+import { KNIT_CONFIG_TEMPLATE, MAIN_TS_TEMPLATE, PKG_JSON_TEMPLATE, README_TEMPLATE, ROOT_CONTROLLER_TEMPLATE, TSCONFIG_TEMPLATE, type TemplateVersions } from "./templates.js";
+
+async function getKnitVersions(currentDir: string): Promise<TemplateVersions> {
+    try {
+        // Adjust path based on where this CLI script executes relative to the monorepo root
+        const corePath = path.resolve(currentDir, "../../core/package.json");
+        const commonPath = path.resolve(currentDir, "../../common/package.json");
+
+        const corePkg = JSON.parse(await readFile(corePath, "utf8"));
+        const commonPkg = JSON.parse(await readFile(commonPath, "utf8"));
+
+        return {
+            coreVersion: corePkg.version,
+            commonVersion: commonPkg.version,
+        };
+    } catch {
+        return {
+            coreVersion: "0.0.7",
+            commonVersion: "0.0.3",
+        };
+    }
+}
 
 async function run() {
     p.intro(pc.cyan("🧶 Create Knit Project"));
@@ -54,25 +75,27 @@ async function run() {
     spinner.start(`Bootstrapping ${pc.cyan(projectName)}...`);
 
     try {
-        // 1. Create directory structure (Zero loose app files—only feature directories!)
+        // 1. Fetch live package versions from monorepo before writing template files
+        const versions = await getKnitVersions(import.meta.dirname || path.dirname(new URL(import.meta.url).pathname));
+
+        // 2. Create directory structure
         const rootDir = path.join(projectPath, "src", "app");
         await mkdir(rootDir, { recursive: true });
 
-        // 2. Write Root Config & Bootstrap Files
-        await writeFile(path.join(projectPath, "package.json"), PKG_JSON_TEMPLATE(projectName));
+        // 3. Write Root Config & Bootstrap Files (passing versions to package.json generator)
+        await writeFile(path.join(projectPath, "package.json"), PKG_JSON_TEMPLATE(projectName, versions));
         await writeFile(path.join(projectPath, "tsconfig.json"), TSCONFIG_TEMPLATE);
         await writeFile(path.join(projectPath, "knit.config.ts"), KNIT_CONFIG_TEMPLATE);
+        await writeFile(path.join(projectPath, "README.md"), README_TEMPLATE);
         await writeFile(path.join(projectPath, "src", "main.ts"), MAIN_TS_TEMPLATE);
 
-        // 3. Write Starter Controller
+        // 4. Write Starter Controller
         await writeFile(path.join(rootDir, "controller.ts"), ROOT_CONTROLLER_TEMPLATE);
 
         spinner.stop(pc.green("Project structure created successfully!"));
 
-        // Quote the directory in case it contains spaces
         const quotedDir = targetDirInput.includes(" ") ? `'${targetDirInput}'` : targetDirInput;
         p.note(`cd ${quotedDir}\n` + `pnpm install  # (or npm install)\n` + `pnpm dev      # starts Knit file watcher & dev server`, "Next Steps");
-
         p.outro(pc.green("✨ All set! Happy building with Knit."));
     } catch (err) {
         spinner.stop(pc.red("Project creation failed."));

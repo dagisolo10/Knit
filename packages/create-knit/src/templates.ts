@@ -1,4 +1,9 @@
-export const PKG_JSON_TEMPLATE = (projectName: string) =>
+export interface TemplateVersions {
+    coreVersion: string;
+    commonVersion: string;
+}
+
+export const PKG_JSON_TEMPLATE = (projectName: string, versions: TemplateVersions) =>
     JSON.stringify(
         {
             name: projectName,
@@ -11,8 +16,8 @@ export const PKG_JSON_TEMPLATE = (projectName: string) =>
                 start: "node dist/main.js",
             },
             dependencies: {
-                "@knitjs/core": "^0.0.6",
-                "@knitjs/common": "^0.0.2",
+                "@knitjs/core": `^${versions.coreVersion}`,
+                "@knitjs/common": `^${versions.commonVersion}`,
             },
             devDependencies: {
                 "@types/node": "^26.6.6",
@@ -74,4 +79,41 @@ export class RootController {
         return { message: "Welcome to knit" };
     }
 }
+`;
+
+export const README_TEMPLATE = `# Scaffolded Knit Application
+
+File-based routing for NestJS, powered by Knit.
+
+## Quickstart
+
+\`\`\`bash
+pnpm install
+pnpm dev
+\`\`\`
+
+## Commands
+
+| Command        | Description                                                    |
+| -------------- | -------------------------------------------------------------- |
+| \`pnpm dev\`   | Start the development server with hot reload (\`knit dev\`).   |
+| \`pnpm build\` | Compile TypeScript source (\`tsc\`).                           |
+| \`pnpm start\` | Run the production build (\`node dist/main.js\`).              |
+
+## Generate Code
+
+| Command                                       | Description                                                |
+| --------------------------------------------- | ---------------------------------------------------------- |
+| \`pnpm knit generate module /users\`          | Create a feature module and root controller at \`/users\`. |
+| \`pnpm knit generate controller /users/[id]\` | Create a sub-controller in an existing feature module.     |
+
+## Shorthands
+
+| Shorthand   | Full form      | Description                |
+| ----------- | -------------- | -------------------------- |
+| \`g\`       | \`generate\`   | Generate a resource.       |
+| \`mo\`      | \`module\`     | Generate a feature module. |
+| \`co\`      | \`controller\` | Generate a controller.     |
+
+Controllers require their root feature module to exist first. Route directories map to paths, and bracket segments like \`[id]\` become route parameters such as \`:id\`.
 `;
