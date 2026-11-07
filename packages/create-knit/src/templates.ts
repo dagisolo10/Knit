@@ -11,8 +11,8 @@ export const PKG_JSON_TEMPLATE = (projectName: string) =>
                 start: "node dist/main.js",
             },
             dependencies: {
+                "@knitjs/core": "0.0.1",
                 "@knitjs/common": "0.0.1",
-                "@knitjs/core": "0.0.4",
             },
             devDependencies: {
                 "@types/node": "^26.6.6",
