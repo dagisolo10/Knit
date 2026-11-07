@@ -1,0 +1,7 @@
+{
+    "cSpell.words": ["knitjs"],
+    "files.exclude": {
+        "**/dist": true,
+        "**/node_modules": true
+    }
+}

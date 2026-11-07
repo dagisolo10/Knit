@@ -1,7 +1,3 @@
-import { defineConfig } from "@knit/core";
+import { defineConfig } from "@knitjs/core";
 
-export default defineConfig({
-    srcDir: "./src/app",
-    outDir: "./src/types",
-    routeFile: "route.ts",
-});
+export default defineConfig({});

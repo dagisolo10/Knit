@@ -88,7 +88,7 @@ async function init() {
 
     const routeFile = projectType === "frontend" ? "page.tsx" : "route.ts";
 
-    const config = `import { defineConfig } from "@knit/core";
+    const config = `import { defineConfig } from "@knitjs/core";
 
 export default defineConfig({
     srcDir: ${JSON.stringify(srcDir.trim())},

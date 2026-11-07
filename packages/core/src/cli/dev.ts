@@ -1,74 +1,121 @@
 import * as p from "@clack/prompts";
-import { access, writeFile } from "fs/promises";
+import { stat } from "fs/promises";
 import path from "path";
 
-import { loadConfig, type KnitConfig } from "../config.js";
-import { DEFAULT_OUT_FILE, generateRouteTypes } from "../routing/generate-route-types.js";
-import { watchRoutes } from "../routing/watcher.js";
+import { generateConfigFile, loadConfig, type ResolvedKnitConfig } from "../config.js";
+import { watchPaths, type WatchHandle, type WatchTargets } from "../routing/watcher.js";
+import { startApplication, stopApplication } from "./child-process.js";
 import { createCliColors } from "./cli-colors.js";
 
 const pc = createCliColors();
 
 /**
- * Regenerates route types and reports the result to the CLI.
+ * Starts the development workflow.
  *
- * @param config - Loaded Knit configuration.
+ * Ensures a Knit config exists, validates the configured entry point and source
+ * directory, starts the application in a child process, and restarts it when
+ * files under the source directory or the entry point change. Changes to
+ * `knit.config.ts` require manually restarting this command.
+ *
+ * The watcher keeps the process alive. SIGINT and SIGTERM close the watcher and
+ * stop the active child process before exiting.
+ *
+ * @throws {Error} If creating or loading the configuration fails, or if the
+ * configured source directory or entry file does not exist.
  */
-async function generate(config: KnitConfig) {
-    const changed = await generateRouteTypes(config);
+export async function dev() {
+    await generateConfigFile();
 
-    if (changed) {
-        const output = path.join(path.relative(process.cwd(), config.outDir), DEFAULT_OUT_FILE);
+    const config = await loadConfig();
 
-        p.log.success(`Types generated → ${output}`);
-    } else {
-        p.log.info("No changes detected. Skipping generation.");
+    await validateProject(config);
+
+    logBanner();
+
+    let child = startApplication(config.entryFile);
+    let restart = Promise.resolve();
+    let shuttingDown = false;
+
+    let watcher: WatchHandle;
+
+    try {
+        watcher = watchPaths(getWatchTargets(config), () => {
+            if (shuttingDown) return;
+
+            logBanner(true);
+
+            restart = restart
+                .then(async () => {
+                    if (shuttingDown) return;
+
+                    await stopApplication(child);
+
+                    if (shuttingDown) return;
+
+                    child = startApplication(config.entryFile);
+                })
+                .catch((error: unknown) => {
+                    console.error("[KNIT] Failed to restart application:", error);
+                });
+
+            return restart;
+        });
+    } catch (error) {
+        await stopApplication(child);
+        throw error;
+    }
+
+    const shutdown = async () => {
+        if (shuttingDown) return;
+
+        shuttingDown = true;
+
+        watcher.close();
+        await stopApplication(child);
+
+        process.exit(0);
+    };
+
+    process.once("SIGINT", () => {
+        void shutdown();
+    });
+
+    process.once("SIGTERM", () => {
+        void shutdown();
+    });
+}
+
+async function validateProject(config: ResolvedKnitConfig): Promise<void> {
+    const [entryFile, srcDir] = await Promise.all([stat(config.entryFile).catch(() => null), stat(config.srcDir).catch(() => null)]);
+
+    if (!srcDir?.isDirectory()) {
+        throw new Error(`Knit source directory not found or is not a directory: ${config.srcDir}`);
+    }
+
+    if (!entryFile?.isFile()) {
+        throw new Error(`Knit entry file not found or is not a file: ${config.entryFile}`);
     }
 }
 
-/**
- * Starts the development workflow.
- *
- * Loads the Knit config, prints the resolved configuration, generates route
- * types once, and then watches the source directory for changes. If the config
- * is missing, a default `knit.config.ts` is created. The file watcher keeps the
- * process alive after this function resolves.
- *
- * @throws {Error} If reading or creating the configuration fails, configuration
- * loading fails, or the initial type generation fails.
- */
-async function dev() {
-    p.intro("🧶 Knit · Development");
+function getWatchTargets(config: ResolvedKnitConfig): WatchTargets {
+    const directories = [config.srcDir];
+    const files: string[] = [];
 
-    const configPath = path.resolve(process.cwd(), "knit.config.ts");
+    // If the entry file is outside srcDir, watch it as an individual file.
+    // If it's inside srcDir, the directory watch already covers it.
+    const entryRelative = path.relative(config.srcDir, config.entryFile);
 
-    try {
-        await access(configPath);
-    } catch (error) {
-        if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-            throw error;
-        }
-
-        const generatedConfig = `import { defineConfig } from "@knit/core";
-
-export default defineConfig({
-    srcDir: "./src/app",
-    outDir: "./src/types",
-    routeFile: "route.ts",
-});
-`;
-
-        try {
-            await writeFile(configPath, generatedConfig, { encoding: "utf-8", flag: "wx" });
-            p.log.success("Created default knit.config.ts");
-        } catch (writeError) {
-            if ((writeError as NodeJS.ErrnoException).code !== "EEXIST") {
-                throw writeError;
-            }
-        }
+    if (entryRelative.startsWith("..") || path.isAbsolute(entryRelative)) {
+        files.push(config.entryFile);
     }
 
-    const config = await loadConfig();
+    return { directories, files };
+}
+
+function logBanner(restart = false) {
+    console.clear();
+
+    p.intro("🧶 Knit · Development");
 
     const banner = `
 ██╗  ██╗ ███╗   ██╗ ██╗ ████████╗
@@ -80,13 +127,5 @@ export default defineConfig({
 `;
     console.log(pc.greenBright(banner));
 
-    p.note([`Source: ${path.relative(process.cwd(), config.srcDir)}`, `Output: ${path.relative(process.cwd(), config.outDir)}`, `Route file: ${config.routeFile}`].join("\n"), "Configuration");
-
-    await generate(config);
-
-    watchRoutes(config.srcDir, async () => await generate(config));
-
-    p.outro("Watching for route changes...");
+    p.log.success(restart ? "Restarted Knit application.\n" : "Knit application started.\n");
 }
-
-export { dev };

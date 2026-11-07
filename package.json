@@ -6,14 +6,16 @@
         "lint": "turbo run lint",
         "build": "turbo run build",
         "check-types": "turbo run check-types",
-        "format": "prettier --write \"**/*.{ts,tsx,md}\""
+        "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+        "create-knit": "pnpm --filter create-knit build && node packages/create-knit/dist/index.js"
     },
     "devDependencies": {
+        "@changesets/cli": "^3.0.3",
         "prettier": "3.9.6",
         "turbo": "^2.11.10",
         "typescript": "7.0.2"
     },
-    "packageManager": "pnpm@12.16.1",
+    "packageManager": "pnpm@12.18.0",
     "engines": {
         "node": ">=24"
     }

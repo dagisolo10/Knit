@@ -1,32 +1,42 @@
 import { readdir } from "fs/promises";
 import path from "path";
 
+import { parseRoute } from "./parser.js";
+
+const ROUTE_FILE = "controller.ts";
+
+export interface DiscoveredRoute {
+    filePath: string;
+    routePath: string;
+}
 
 /**
  * Recursively finds route files under a source directory.
  *
  * Every directory is traversed, and files whose name exactly matches
- * `routeFile` are returned.
+ * `controller.ts` are returned.
  *
  * @param srcDir - Root directory to scan.
- * @param routeFile - Route filename to match, such as `route.ts`.
- * @returns Paths to the discovered route files, built from `srcDir`.
+ * @param rootDir - Root directory used to derive route paths. Defaults to `srcDir`.
+ * @returns The discovered route files and their derived route paths.
  * @throws {NodeJS.ErrnoException} If a directory cannot be read.
  */
-export async function scanRoutes(srcDir: string, routeFile: string): Promise<string[]> {
+export async function scanRoutes(srcDir: string, rootDir = srcDir): Promise<DiscoveredRoute[]> {
     const entries = await readdir(srcDir, { withFileTypes: true });
 
-    const routes: string[] = [];
+    const routes: DiscoveredRoute[] = [];
 
     for (const entry of entries) {
         const fullPath = path.join(srcDir, entry.name);
 
         if (entry.isDirectory()) {
-            routes.push(...(await scanRoutes(fullPath, routeFile)));
+            routes.push(...(await scanRoutes(fullPath, rootDir)));
         }
 
-        if (entry.isFile() && entry.name === routeFile) {
-            routes.push(fullPath);
+        if (entry.isFile() && entry.name === ROUTE_FILE) {
+            const routePath = parseRoute(fullPath, rootDir);
+
+            routes.push({ routePath, filePath: fullPath });
         }
     }
 

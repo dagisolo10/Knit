@@ -1,10 +1,14 @@
 {
-    "name": "@knit/core",
-    "version": "0.0.1",
+    "name": "@knitjs/core",
+    "version": "0.0.7",
+    "description": "Core framework and CLI for Knit applications",
     "type": "module",
     "license": "ISC",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
+    "publishConfig": {
+        "access": "public"
+    },
     "exports": {
         ".": {
             "import": "./dist/index.js",
@@ -18,15 +22,18 @@
         "build": "tsc",
         "dev:build": "tsc --watch"
     },
+    "dependencies": {
+        "@clack/prompts": "^1.8.1",
+        "@knitjs/common": "^0.0.3",
+        "@nestjs/core": "^12.3.2",
+        "@nestjs/platform-express": "^12.3.2",
+        "commander": "^15.0.0",
+        "picocolors": "^1.1.1",
+        "reflect-metadata": "^0.2.2",
+        "tsx": "^4.23.15"
+    },
     "devDependencies": {
         "@types/node": "^26.6.6",
         "typescript": "^7.0.2"
-    },
-    "dependencies": {
-        "@clack/prompts": "^1.8.1",
-        "commander": "^15.0.0",
-        "picocolors": "^1.1.1",
-        "tsx": "^4.23.15",
-        "vite": "^8.3.5"
     }
 }

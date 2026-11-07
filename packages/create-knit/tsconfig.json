@@ -1,0 +1,37 @@
+{
+    "compilerOptions": {
+        "rootDir": "./src",
+        "outDir": "dist",
+
+        "target": "es2020",
+        "types": ["node"],
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
+
+        // Other Outputs
+        "sourceMap": true,
+        "declaration": true,
+        "declarationMap": true,
+
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+
+        // Style Options
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true,
+
+        // Recommended and Stricter Typechecking Options
+        "strict": true,
+        "skipLibCheck": true,
+        "noEmitOnError": true,
+        "isolatedModules": true,
+        "moduleDetection": "force",
+        "verbatimModuleSyntax": true,
+        "noUncheckedIndexedAccess": true,
+        "exactOptionalPropertyTypes": true,
+        "noUncheckedSideEffectImports": true
+    },
+    "include": ["src"]
+}
