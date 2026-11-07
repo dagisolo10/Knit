@@ -12,7 +12,7 @@ export const PKG_JSON_TEMPLATE = (projectName: string) =>
             },
             dependencies: {
                 "@knitjs/common": "0.0.1",
-                "@knitjs/core": "0.0.2",
+                "@knitjs/core": "0.0.3",
             },
             devDependencies: {
                 "@types/node": "^26.6.6",

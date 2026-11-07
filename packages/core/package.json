@@ -1,6 +1,6 @@
 {
     "name": "@knitjs/core",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "Core framework and CLI for Knit applications",
     "type": "module",
     "license": "ISC",
@@ -28,7 +28,7 @@
     },
     "dependencies": {
         "@clack/prompts": "^1.8.1",
-        "@knitjs/common": "workspace:*",
+        "@knitjs/common": "0.0.1",
         "@nestjs/core": "^12.3.2",
         "commander": "^15.0.0",
         "picocolors": "^1.1.1",
