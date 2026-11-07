@@ -11,12 +11,12 @@ export const PKG_JSON_TEMPLATE = (projectName: string) =>
                 start: "node dist/main.js",
             },
             dependencies: {
-                "@knit/common": "workspace:*",
-                "@knit/core": "workspace:*",
+                "@knit/common": "latest",
+                "@knit/core": "latest",
             },
             devDependencies: {
                 "@types/node": "^26.6.6",
-                typescript: "^5.0.0",
+                typescript: "^7.0.2",
             },
         },
         null,
@@ -55,7 +55,7 @@ export const MAIN_TS_TEMPLATE = `import { KnitFactory, Logger } from "@knit/core
 
 async function bootstrap() {
     const app = await KnitFactory.create();
-    const port = process.env["PORT"] ?? 3000;
+    const port = Number(process.env["PORT"] ?? 3000);
 
     await app.listen(port);
 

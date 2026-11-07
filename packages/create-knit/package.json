@@ -2,12 +2,16 @@
     "name": "create-knit",
     "version": "0.1.0",
     "type": "module",
+    "files": [
+        "dist"
+    ],
     "bin": {
         "create-knit": "./dist/index.js"
     },
     "scripts": {
         "build": "tsc",
-        "dev:build": "tsc --watch"
+        "dev:build": "tsc --watch",
+        "prepublishOnly": "npm run build"
     },
     "license": "ISC",
     "dependencies": {

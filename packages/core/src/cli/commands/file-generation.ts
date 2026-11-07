@@ -29,7 +29,6 @@ export async function generateFile(relativeSrcDir: string, routePath: string, re
             await writeFile(controllerPath, content, { encoding: "utf8", flag: "wx" });
             createdFiles.push(controllerPath);
         } catch (error: any) {
-            await Promise.allSettled(createdFiles.map((file) => rm(file, { force: true })));
             if (error.code === "EEXIST") {
                 throw new Error(`Controller already exists at:\n ${controllerPath}\nSkip generating the controller or remove the existing file first.`);
             }
@@ -43,6 +42,7 @@ export async function generateFile(relativeSrcDir: string, routePath: string, re
         await writeFile(filePath, content, { encoding: "utf8", flag: "wx" });
         createdFiles.push(filePath);
     } catch (error: any) {
+        await Promise.allSettled(createdFiles.map((file) => rm(file, { force: true })));
         if (error.code === "EEXIST") {
             throw new Error(`File already exists at:\n ${filePath}\nSkip generating or remove the existing file first.`);
         }

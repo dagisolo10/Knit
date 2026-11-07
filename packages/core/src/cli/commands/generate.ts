@@ -76,6 +76,10 @@ export async function generateRouteCommand(args: GeneratorArguments) {
     const relativeSrcDir = path.relative(process.cwd(), config.srcDir);
 
     const isModule = isType(resourceType, ["module", "mo"]);
+    if (isModule && routePath === "/") {
+        abortGeneration(spinner, pc, "Modules cannot be created at the root route '/'.", "Cannot Create Module");
+    }
+
     if (isModule) {
         const isSubPath = await subPathModuleRestriction(relativeSrcDir, routePath);
         if (isSubPath) {

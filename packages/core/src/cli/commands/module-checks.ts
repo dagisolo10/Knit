@@ -131,8 +131,10 @@ async function updateFeatureModule(moduleFilePath: string, newControllerClassNam
  * @returns The updated module source text
  */
 function addControllersMetadata(content: string, newControllerClassName: string, moduleFilePath: string): string {
+    // Strip strings and comments first so a @Module({ inside a comment doesn't match
+    const stripped = stripStringsAndComments(content);
     // Find the start of @Module(
-    const moduleStartMatch = content.match(/@Module\s*\(\s*\{/);
+    const moduleStartMatch = stripped.match(/@Module\s*\(\s*\{/);
 
     if (!moduleStartMatch) {
         throw new Error(`Could not find an @Module decorator in ${moduleFilePath}. Add ${newControllerClassName} to the module's controllers manually.`);
@@ -141,20 +143,21 @@ function addControllersMetadata(content: string, newControllerClassName: string,
     const openBracePos = moduleStartMatch.index! + moduleStartMatch[0].length - 1; // position of the opening {
     const bodyStart = openBracePos + 1;
 
-    // Find the matching closing brace using a depth counter
-    const closeBracePos = findMatchingCloseBrace(content, bodyStart);
+    // Find the matching closing brace using a depth counter (on stripped content to avoid false braces)
+    const closeBracePos = findMatchingCloseBrace(stripped, bodyStart);
 
     if (closeBracePos === -1) {
         throw new Error(`Could not find the closing brace of @Module in ${moduleFilePath}. Add ${newControllerClassName} to the module's controllers manually.`);
     }
 
-    // Find the closing ) after the closing }
-    const afterBrace = content.slice(closeBracePos + 1);
+    // Find the closing ) after the closing } (on stripped content)
+    const afterBrace = stripped.slice(closeBracePos + 1);
     const closingParenMatch = afterBrace.match(/^\s*\)/);
     if (!closingParenMatch) {
         throw new Error(`Could not find the closing parenthesis of @Module in ${moduleFilePath}. Add ${newControllerClassName} to the module's controllers manually.`);
     }
 
+    // Use original content for body extraction to preserve formatting
     const body = content.slice(bodyStart, closeBracePos);
     const indent = body.match(/\n([ \t]+)\S/)?.[1] ?? "    ";
     const trimmedBody = body.trimEnd();
@@ -254,6 +257,19 @@ function stripStringsAndComments(source: string): string {
                 if (source[i] === "\\") {
                     result += "  ";
                     i += 2;
+                } else if (source[i] === "$" && source[i + 1] === "{") {
+                    // Template expression ${...} — strip the expression content
+                    // but track nested braces to find the closing }
+                    result += "  "; // $
+                    result += " "; // {
+                    i += 2;
+                    let braceDepth = 1;
+                    while (i < source.length && braceDepth > 0) {
+                        if (source[i] === "{") braceDepth++;
+                        else if (source[i] === "}") braceDepth--;
+                        result += " ";
+                        i++;
+                    }
                 } else {
                     result += " ";
                     i++;
@@ -344,10 +360,12 @@ function findLastImportEnd(content: string): number {
 
     for (const line of lines) {
         const lineEnd = offset + line.length + 1;
-        const trimmed = line.trim();
+        // Strip strings and comments so a comment containing `from "x"` doesn't end the import early
+        const strippedLine = stripStringsAndComments(line);
+        const strippedTrimmed = strippedLine.trim();
 
         if (!inImport) {
-            if (/^import\s/.test(trimmed)) {
+            if (/^import\s/.test(strippedTrimmed)) {
                 inImport = true;
                 braceDepth = countCharOutsideStringsAndComments(line, "{") - countCharOutsideStringsAndComments(line, "}");
 
@@ -360,8 +378,8 @@ function findLastImportEnd(content: string): number {
             }
         } else {
             // Check if this line ends the import via `from "..."` or `import "..."`
-            // This handles multiline imports where brace counting might be unreliable
-            if (/from\s+["'`]/.test(trimmed) || /^import\s+["'`]/.test(trimmed)) {
+            // Run on stripped text so a comment with `from "x"` doesn't end the import early
+            if (/from\s+["'`]/.test(strippedTrimmed) || /^import\s+["'`]/.test(strippedTrimmed)) {
                 lastImportEnd = lineEnd;
                 inImport = false;
                 continue;
