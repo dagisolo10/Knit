@@ -1,5 +1,5 @@
 {
-    "name": "create-knit",
+    "name": "create-knit-app",
     "version": "0.1.5",
     "type": "module",
     "publishConfig": {
@@ -9,7 +9,7 @@
         "dist"
     ],
     "bin": {
-        "create-knit": "./dist/index.js"
+        "create-knit-app": "./dist/index.js"
     },
     "scripts": {
         "build": "tsc",
