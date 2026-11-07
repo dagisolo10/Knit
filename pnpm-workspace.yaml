@@ -3,6 +3,8 @@ packages:
     - "examples/*"
 allowBuilds:
     builds: true
+minimumReleaseAgeExclude:
+    - "@knitjs/common@0.0.1"
 permissions:
     '@nestjs/core':
       build: true

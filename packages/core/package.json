@@ -1,6 +1,6 @@
 {
     "name": "@knitjs/core",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "Core framework and CLI for Knit applications",
     "type": "module",
     "license": "ISC",
@@ -22,17 +22,18 @@
         "build": "tsc",
         "dev:build": "tsc --watch"
     },
-    "devDependencies": {
-        "@types/node": "^26.6.6",
-        "typescript": "^7.0.2"
-    },
     "dependencies": {
         "@clack/prompts": "^1.8.1",
         "@knitjs/common": "0.0.1",
         "@nestjs/core": "^12.3.2",
+        "@nestjs/platform-express": "^12.3.2",
         "commander": "^15.0.0",
         "picocolors": "^1.1.1",
         "reflect-metadata": "^0.2.2",
         "tsx": "^4.23.15"
+    },
+    "devDependencies": {
+        "@types/node": "^26.6.6",
+        "typescript": "^7.0.2"
     }
 }

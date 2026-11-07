@@ -220,11 +220,14 @@ importers:
         specifier: ^1.8.1
         version: 1.8.1
       '@knitjs/common':
-        specifier: workspace:*
-        version: link:../common
+        specifier: 0.0.1
+        version: 0.0.1(rxjs@7.8.2)(supports-color@7.2.0)
       '@nestjs/core':
         specifier: ^12.3.2
         version: 12.3.2(@nestjs/common@12.3.2(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/platform-express@12.3.2)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express':
+        specifier: ^12.3.2
+        version: 12.3.2(@nestjs/common@12.3.2(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.3.2)(supports-color@7.2.0)
       commander:
         specifier: ^15.0.0
         version: 15.0.0
@@ -429,6 +432,9 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@knitjs/common@0.0.1':
+    resolution: {integrity: sha512-7JW6erCXawfMZpBi2q9aUQwUmIUMANLUvIa2uVlc+XzgCZlLSxzRjdMw6ymTmR/U+FYFZAgRGF6PsooZSD3s6Q==}
 
   '@lukeed/csprng@1.1.0':
     resolution: {integrity: sha512-Z7C/xXCiGWsg0KuKsHTKJxbWhpI3Vs5GwLfOean7MGyVFGqdRgBbAjOCh6u4bbjPc/8MJ2pZmK/0DLdCbivLDA==}
@@ -1125,6 +1131,16 @@ snapshots:
 
   '@esbuild/win32-x64@0.28.2':
     optional: true
+
+  '@knitjs/common@0.0.1(rxjs@7.8.2)(supports-color@7.2.0)':
+    dependencies:
+      '@nestjs/common': 12.3.2(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0)
+      reflect-metadata: 0.2.2
+    transitivePeerDependencies:
+      - class-transformer
+      - class-validator
+      - rxjs
+      - supports-color
 
   '@lukeed/csprng@1.1.0': {}
 
