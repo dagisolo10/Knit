@@ -6,7 +6,8 @@
         "lint": "turbo run lint",
         "build": "turbo run build",
         "check-types": "turbo run check-types",
-        "format": "prettier --write \"**/*.{ts,tsx,md}\""
+        "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+        "create-knit": "pnpm --filter create-knit build && node packages/create-knit/dist/index.js"
     },
     "devDependencies": {
         "prettier": "3.9.6",

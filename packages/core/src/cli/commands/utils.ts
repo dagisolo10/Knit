@@ -33,7 +33,7 @@ export function generateClassName(routePath: string, resourceType: FullType) {
         .map(capitalize)
         .join("");
 
-    return capitalize(name) + capitalize(resourceType);
+    return capitalize(routePath === "/" ? "root" : name) + capitalize(resourceType);
 }
 
 /**
@@ -83,6 +83,8 @@ export function isValidRoutePath(value: string): boolean {
 
     // 1. Must start with a forward slash
     if (!value.startsWith("/")) return false;
+
+    if (value === "/") return true;
 
     // Remove the leading slash and split into segments (e.g., "/users/[id]" -> ["users", "[id]"])
     const cleanPath = value.slice(1);

@@ -42,7 +42,6 @@ export async function dev() {
         watcher = watchPaths(getWatchTargets(config), () => {
             if (shuttingDown) return;
 
-            console.clear();
             logBanner(true);
 
             restart = restart

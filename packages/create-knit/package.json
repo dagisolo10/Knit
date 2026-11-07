@@ -1,0 +1,21 @@
+{
+    "name": "create-knit",
+    "version": "0.1.0",
+    "type": "module",
+    "bin": {
+        "create-knit": "./dist/index.js"
+    },
+    "scripts": {
+        "build": "tsc",
+        "dev:build": "tsc --watch"
+    },
+    "license": "ISC",
+    "dependencies": {
+        "@clack/prompts": "^1.8.1",
+        "picocolors": "^1.1.1"
+    },
+    "devDependencies": {
+        "@types/node": "^26.6.6",
+        "typescript": "^7.0.2"
+    }
+}

@@ -17,7 +17,6 @@ import { abortGeneration, capitalize, getRootSegment, isType, isValidRoutePath }
  * @param args - CLI arguments containing optional resource type and route name/path
  */
 export async function generateRouteCommand(args: GeneratorArguments) {
-    console.clear();
     const pc = createCliColors();
     const config = await loadConfig();
     p.intro(pc.cyan("🧶 Knit Code Generator"));
@@ -96,7 +95,7 @@ export async function generateRouteCommand(args: GeneratorArguments) {
     }
 
     const isController = isType(resourceType, ["controller", "co"]);
-    if (isController) {
+    if (isController && routePath !== "/") {
         const moduleExists = await rootModuleCheck(relativeSrcDir, routePath);
         if (!moduleExists) {
             const rootFeatureName = getRootSegment(routePath);
@@ -120,7 +119,7 @@ export async function generateRouteCommand(args: GeneratorArguments) {
 
     const updatedFiles: string[] = [];
 
-    if (isController) {
+    if (isController && routePath !== "/") {
         try {
             const updatedFile = await registerControllerInModule(relativeSrcDir, routePath);
             updatedFiles.push(updatedFile);

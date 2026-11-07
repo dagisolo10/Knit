@@ -4,6 +4,8 @@ packages:
 allowBuilds:
     builds: true
 permissions:
+    '@nestjs/core':
+      build: true
     builds:
         skills: true
     esbuild:
