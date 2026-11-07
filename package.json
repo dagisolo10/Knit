@@ -10,6 +10,7 @@
         "create-knit": "pnpm --filter create-knit build && node packages/create-knit/dist/index.js"
     },
     "devDependencies": {
+        "@changesets/cli": "^3.0.3",
         "prettier": "3.9.6",
         "turbo": "^2.11.10",
         "typescript": "7.0.2"
